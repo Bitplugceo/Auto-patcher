@@ -1,9 +1,8 @@
-S
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <meta name="theme-color" content="#075e54">
   <title>BITPLUG CEO</title>
   <!-- Pinned version so a future breaking release can't kill the page -->
@@ -206,7 +205,7 @@ S
 
   <div class="viewer" id="viewer">
     <button type="button" class="viewer-back" id="viewer-back">← Back</button>
-    <div class="reel" id="viewer-reel"></div>
+    <img id="viewer-img" alt="">
   </div>
 
   <script>
@@ -217,6 +216,8 @@ S
     const featured = ["Lagos", "Oyo", "FCT"];
     const states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","FCT"];
 
+    document.addEventListener("gesturestart", (e) => e.preventDefault());
+    document.addEventListener("touchmove", (e) => { if (e.touches.length > 1 && !e.target.closest(".viewer")) e.preventDefault(); }, { passive: false });
     const $ = (id) => document.getElementById(id);
     const city = $("city"), pick = $("pick");
     states.forEach((s) => city.add(new Option(s, s)));
@@ -459,16 +460,9 @@ S
     });
 
     // ---------- screenshot viewer ----------
-    const reel = $("viewer-reel");
-    document.querySelectorAll(".shots img").forEach((img) => {
-      const slide = document.createElement("div");
-      slide.className = "slide";
-      slide.appendChild(img.cloneNode());
-      reel.appendChild(slide);
-    });
     document.querySelectorAll(".shots img").forEach((img) => img.addEventListener("click", () => {
+      $("viewer-img").src = img.src;
       $("viewer").classList.add("show");
-      reel.scrollLeft = 0;
     }));
     $("viewer-back").addEventListener("click", () => $("viewer").classList.remove("show"));
 
