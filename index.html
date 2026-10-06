@@ -32,7 +32,7 @@
     input, select { width:100%; background:var(--chip); border:0; border-radius:12px; padding:14px; font:inherit; }
     .person { display:flex; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid var(--line); }
     .person span, .empty { color:var(--muted); font-size:13px; }
-    .kicker { color:var(--deep); font-size:12px; font-weight:800; letter-spacing:.12em; }
+    .actions { text-align:center; margin-top:16px; }
     @media (max-width:800px) { .steps, .batches { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -68,10 +68,10 @@
         <label for="name">Name</label>
         <input id="name" placeholder="Ada Cole" required>
         <label for="phone">Number</label>
-        <input id="phone" type="tel" placeholder="+234 800 000 0000" required>
+        <input id="phone" type="tel" inputmode="tel" placeholder="08012345678 or +2348012345678" required>
         <label for="city">Your city</label>
         <select id="city"></select>
-        <button class="btn" style="margin-top:16px" type="submit">Save contact</button>
+        <div class="actions"><button class="btn" type="submit">Save contact</button></div>
       </form>
       <div class="card">
         <div class="kicker">DOWNLOAD</div>
@@ -79,12 +79,12 @@
         <label for="pick">Your city</label>
         <select id="pick"></select>
         <div id="list"></div>
-        <button class="btn" style="margin-top:14px" type="button" onclick="downloadFiltered()">Download this .vcf</button>
+        <div class="actions"><button class="btn" type="button" onclick="downloadFiltered()">Download this .vcf</button></div>
       </div>
     </div>
   </section>
   <script>
-    const NC = { url: "https://YOUR.supabase.co", key: "YOUR_ANON_KEY" };
+    const NC = { url: "https://frvajexelqybambebyno.supabase.co", key: "sb_publishable_C4r6K4LxXccnppbVvYuqpA_AVmwl6vj" };
     const states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","FCT"];
     const city = document.getElementById("city");
     const pick = document.getElementById("pick");
@@ -98,17 +98,17 @@
     const localSave = (list) => localStorage.setItem(key, JSON.stringify(list));
     async function loadAll() {
       if (!db) return localLoad();
-      const { data, error } = await db.from("contacts").select("name,phone,city").order("id", { ascending: true });
+      let q = db.from("contacts").select("name,phone,city").order("id", { ascending: true });
+      if (pick.value !== "all") q = q.eq("city", pick.value);
+      const { data, error } = await q;
       if (error) return localLoad();
       return data || [];
     }
-    function shown(list) { return pick.value === "all" ? list : list.filter((c) => c.city === pick.value); }
     function renderList(list) {
-      const rows = shown(list);
       const box = document.getElementById("list");
       box.innerHTML = "";
-      if (!rows.length) { box.innerHTML = "<p class='empty'>Nothing in this batch yet.</p>"; return; }
-      rows.forEach((c) => {
+      if (!list.length) { box.innerHTML = "<p class='empty'>Nothing in this batch yet.</p>"; return; }
+      list.forEach((c) => {
         const row = document.createElement("div");
         row.className = "person";
         const left = document.createElement("div");
@@ -122,7 +122,7 @@
       });
     }
     async function downloadFiltered() {
-      const list = shown(await loadAll());
+      const list = await loadAll();
       if (!list.length) return;
       const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
@@ -134,7 +134,19 @@
     pick.addEventListener("change", async () => renderList(await loadAll()));
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const row = { name: document.getElementById("name").value.trim(), phone: document.getElementById("phone").value.trim(), city: city.value };
+      const phoneEl = document.getElementById("phone");
+      const raw = phoneEl.value.replace(/[\s-]/g, "");
+      let phone = "";
+      if (/^0\d{10}$/.test(raw)) phone = "+234" + raw.slice(1);
+      else if (/^\+234[1-9]\d{9}$/.test(raw)) phone = raw;
+      else if (/^234[1-9]\d{9}$/.test(raw)) phone = "+" + raw;
+      if (!phone) {
+        phoneEl.setCustomValidity("Use 11 digits, like 08012345678, or 13 digits with 234, like +2348012345678");
+        phoneEl.reportValidity();
+        return;
+      }
+      phoneEl.setCustomValidity("");
+      const row = { name: document.getElementById("name").value.trim(), phone, city: city.value };
       if (db) await db.from("contacts").insert(row);
       else { const list = localLoad(); list.push(row); localSave(list); }
       e.target.reset();
