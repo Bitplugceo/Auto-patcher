@@ -2,175 +2,215 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Wallet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Northcurrent</title>
   <style>
-    :root { --bg:#fff; --ink:#111; --muted:#8b919a; --line:#eceff3; --chip:#f3f4f6; --blue:#3d5afe; --red:#e5484d; --green:#1f9d55; }
+    :root { --bg:#fff; --ink:#121212; --muted:#8d939c; --chip:#f2f3f5; --line:#eceff3; --blue:#3557ff; --red:#e23b40; --green:#16944c; }
     * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#e9edf2; color:var(--ink); }
-    .phone { max-width:430px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; padding-bottom:108px; }
-    header.top { display:flex; align-items:center; justify-content:space-between; padding:18px 16px 8px; }
-    .wallet-pill, .icon-btn, .chip, .tab, .nav-btn { border:none; background:var(--chip); color:var(--ink); }
-    .wallet-pill { display:flex; align-items:center; gap:8px; border-radius:999px; padding:6px 12px 6px 6px; font-weight:650; }
-    .dot { width:28px; height:28px; border-radius:50%; background:#3dcc6e; color:#fff; display:grid; place-items:center; font-size:14px; }
-    .icon-btn { width:38px; height:38px; border-radius:50%; font-size:16px; }
-    .right { display:flex; gap:8px; }
-    .banner { margin:10px 16px; border:1px solid #edf1f4; border-radius:16px; padding:12px; display:flex; gap:10px; align-items:center; }
+    html, body { height:100%; background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    button, input { font:inherit; color:inherit; }
+    .app { min-height:100%; padding-bottom:96px; }
+    .view { display:none; min-height:100%; }
+    .view.on { display:block; }
+    .top { display:flex; align-items:center; justify-content:space-between; padding:16px 16px 8px; }
+    .pill, .ib, .chip, .navb { border:0; background:var(--chip); }
+    .pill { display:flex; align-items:center; gap:8px; border-radius:999px; padding:6px 12px 6px 6px; font-weight:700; }
+    .g { width:28px; height:28px; border-radius:50%; background:#2fce67; color:#fff; display:grid; place-items:center; }
+    .ib { width:40px; height:40px; border-radius:50%; }
+    .rowbtns { display:flex; gap:8px; }
+    .banner { margin:8px 16px; border:1px solid var(--line); border-radius:16px; padding:12px; display:flex; gap:10px; align-items:center; }
     .banner b { display:block; font-size:14px; }
-    .banner span { color:var(--muted); font-size:12px; }
-    .fee { width:36px; height:36px; border-radius:12px; background:#e9f8ee; display:grid; place-items:center; }
-    .bal { padding:18px 16px 6px; font-size:42px; font-weight:750; letter-spacing:-1px; }
-    .sub { padding:0 16px 16px; color:var(--muted); font-size:14px; }
-    .actions { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:0 16px 18px; text-align:center; font-size:13px; color:#444; }
-    .act { width:100%; aspect-ratio:1; border-radius:22px; background:var(--chip); font-size:22px; }
+    .banner span, .muted, small { color:var(--muted); font-size:12px; }
+    .sq { width:36px; height:36px; border-radius:12px; background:#e7f8ee; display:grid; place-items:center; }
+    .bal { font-size:44px; font-weight:760; letter-spacing:-1px; padding:18px 16px 0; }
+    .sub { padding:4px 16px 16px; color:var(--muted); }
+    .acts { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:0 16px 18px; text-align:center; font-size:13px; }
+    .act { width:100%; aspect-ratio:1.05; border:0; border-radius:22px; background:var(--chip); font-size:22px; }
     .act.on { background:var(--blue); color:#fff; }
-    .sec { display:flex; justify-content:space-between; align-items:center; padding:8px 16px; font-weight:700; }
-    .row { display:flex; align-items:center; gap:12px; padding:12px 16px; }
-    .coin { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:800; }
+    .sec { padding:8px 16px; font-weight:750; }
+    .token { width:100%; display:flex; align-items:center; gap:12px; padding:12px 16px; background:#fff; border:0; text-align:left; }
+    .coin { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; color:#fff; font-weight:800; flex:none; }
     .grow { flex:1; }
-    .grow small, .meta { display:block; color:var(--muted); font-size:12px; }
-    .amt { text-align:right; font-weight:650; }
-    .down { color:var(--red); font-size:12px; }
-    .up { color:var(--green); font-size:12px; }
-    .view { margin:8px 16px; border:none; background:var(--chip); border-radius:999px; padding:12px 16px; font-weight:650; }
-    .screen { display:none; }
-    .screen.on { display:block; }
-    h1 { text-align:center; font-size:20px; padding:8px 0 14px; }
+    .amt { text-align:right; font-weight:700; }
+    .down { color:var(--red); font-size:12px; } .up { color:var(--green); font-size:12px; }
+    .viewall { margin:8px 16px 16px; border:0; background:var(--chip); border-radius:999px; padding:12px 16px; font-weight:700; }
+    h1 { font-size:18px; }
     .pair { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 16px; }
-    .big { background:var(--chip); border-radius:18px; padding:16px; text-align:left; border:none; font-weight:700; }
-    .cards { display:flex; gap:10px; overflow:auto; padding:16px; }
-    .card { min-width:168px; background:var(--chip); border-radius:18px; padding:14px; }
-    .spark { height:54px; margin-top:10px; }
-    .filters { display:flex; gap:8px; overflow:auto; padding:0 16px 12px; }
-    .chip { border-radius:999px; padding:8px 12px; font-size:13px; white-space:nowrap; }
-    .chip.on { background:#eceff5; font-weight:700; }
-    .sorts { display:flex; gap:8px; padding:0 16px 8px; }
-    .perp-hero { display:flex; justify-content:space-between; align-items:center; padding:8px 16px 16px; }
-    .perp-hero h2 { font-size:28px; line-height:1.05; letter-spacing:-.4px; }
-    .inf { width:84px; height:48px; }
-    .deposit { margin:0 16px 18px; width:calc(100% - 32px); background:var(--blue); color:#fff; border:none; border-radius:999px; padding:16px; font-size:16px; font-weight:700; }
-    .lev { background:#eceff3; color:#667; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px; }
-    .trade { position:sticky; bottom:92px; display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:8px 16px; background:linear-gradient(#fff0,#fff 30%); }
-    .long, .short { border:none; color:#fff; border-radius:999px; padding:14px; font-weight:750; }
-    .long { background:#1f9d55; } .short { background:#e5484d; }
-    .dock { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; width:min(400px, calc(100% - 28px)); background:#f7f8fa; border-radius:28px; display:flex; justify-content:space-around; padding:8px; box-shadow:0 8px 30px rgba(0,0,0,.08); }
-    .nav-btn { width:64px; height:48px; border-radius:18px; font-size:20px; }
-    .nav-btn.on { background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.05); }
-    .sheet { position:fixed; inset:0; background:rgba(9,11,16,.45); display:none; align-items:flex-end; justify-content:center; z-index:5; }
-    .sheet.show { display:flex; }
-    .panel { width:min(430px,100%); background:#fff; border-radius:22px 22px 0 0; padding:18px 16px 28px; }
-    .panel h3 { font-size:24px; margin:6px 0 12px; }
-    input, select { width:100%; border:1px solid var(--line); background:#f7f8fa; border-radius:12px; padding:12px; margin-bottom:8px; font:inherit; }
-    .ok { width:100%; background:var(--blue); color:#fff; border:none; border-radius:999px; padding:14px; font-weight:750; }
-    .note { color:var(--muted); font-size:13px; margin-top:8px; }
+    .cardbtn { background:var(--chip); border:0; border-radius:18px; padding:18px; font-weight:750; text-align:left; }
+    .hscroll { display:flex; gap:10px; overflow:auto; padding:12px 16px; }
+    .mcard { min-width:170px; background:var(--chip); border-radius:18px; padding:14px; }
+    .filters { display:flex; gap:8px; overflow:auto; padding:0 16px 10px; }
+    .chip { border-radius:999px; padding:8px 12px; white-space:nowrap; }
+    .chip.on { font-weight:750; }
+    .swapbar { position:sticky; bottom:88px; padding:8px 16px; background:#fff; }
+    .blue, .long, .short, .ok { border:0; color:#fff; border-radius:999px; padding:16px; font-weight:750; width:100%; }
+    .blue, .ok { background:var(--blue); }
+    .trade { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:12px 16px 8px; }
+    .long { background:var(--green); } .short { background:var(--red); }
+    .dock { position:fixed; left:12px; right:12px; bottom:12px; background:#f6f7f9; border-radius:28px; display:flex; justify-content:space-around; padding:8px; z-index:3; }
+    .navb { width:68px; height:48px; border-radius:18px; font-size:18px; }
+    .navb.on { background:#fff; }
+    .sheet { position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; z-index:6; }
+    .sheet.show { display:block; }
+    .panel { position:absolute; left:0; right:0; bottom:0; top:48px; background:#fff; border-radius:22px 22px 0 0; overflow:auto; padding-bottom:24px; }
+    .search { margin:8px 16px; background:var(--chip); border:0; border-radius:999px; padding:12px 14px; width:calc(100% - 32px); }
+    .pad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:8px 16px; text-align:center; }
+    .pad button { background:none; border:0; font-size:28px; padding:12px; }
+    .box { margin:8px 16px; background:var(--chip); border-radius:16px; padding:14px; display:flex; justify-content:space-between; align-items:center; }
+    .amount { font-size:52px; font-weight:760; text-align:center; padding:28px 16px 0; }
+    .warn { margin:12px 16px; background:#fff6e8; border-radius:12px; padding:12px; font-size:13px; }
+    .chart { margin:8px 16px; height:220px; border:1px solid var(--line); border-radius:12px; background:linear-gradient(#fff,#fafafa); }
+    .back { width:40px; height:40px; border-radius:50%; border:0; background:var(--chip); }
   </style>
 </head>
 <body>
-  <div class="phone">
-    <section class="screen on" id="home">
-      <header class="top">
-        <button class="wallet-pill" type="button"><span class="dot">▣</span> Wallet 1</button>
-        <div class="right"><button class="icon-btn" type="button">◷</button><button class="icon-btn" type="button">⇅</button></div>
-      </header>
-      <div class="banner"><div class="fee">$</div><div><b>0% swap fees on selected stables</b><span>Applicable to same-chain swaps only</span></div></div>
+  <div class="app">
+    <section class="view on" id="home">
+      <div class="top"><button class="pill"><span class="g">▣</span> Wallet 1</button><div class="rowbtns"><button class="ib">◷</button><button class="ib">⇅</button></div></div>
+      <div class="banner"><div class="sq">$</div><div><b>0% swap fees on selected stables</b><span>Applicable to same-chain swaps only</span></div></div>
       <div class="bal">$0.11</div>
       <div class="sub">$0.00 (0.41%)</div>
-      <div class="actions">
-        <div><button class="act" type="button">↗</button>Send</div>
-        <div><button class="act" type="button">↓</button>Receive</div>
-        <div><button class="act on" type="button" onclick="show('markets')">↻</button>Swap</div>
-        <div><button class="act" type="button" onclick="openDeposit()">+</button>Buy</div>
+      <div class="acts">
+        <div><button class="act" onclick="openSheet('send')">↗</button>Send</div>
+        <div><button class="act" onclick="openSheet('receive')">↓</button>Receive</div>
+        <div><button class="act on" onclick="openSheet('swap')">↻</button>Swap</div>
+        <div><button class="act" onclick="openSheet('buy')">+</button>Buy</div>
       </div>
-      <div class="sec"><span>Tokens ›</span></div>
-      <div class="row"><div class="coin" style="background:#111">S</div><div class="grow"><b>Solana</b><small>0.00089138 SOL</small></div><div class="amt">$0.1075<div class="down">-$0.000443</div></div></div>
-      <div class="row"><div class="coin" style="background:#111">X</div><div class="grow"><b>XRP</b><small>0.000001 XRP</small></div><div class="amt">$0.0001503<div class="down">-$0.0001874</div></div></div>
-      <div class="row"><div class="coin" style="background:#f7931a">B</div><div class="grow"><b>Bitcoin</b><small>0 BTC</small></div><div class="amt">$0.00<div class="meta">$0.00</div></div></div>
-      <div class="row"><div class="coin" style="background:#627eea">E</div><div class="grow"><b>Ethereum</b><small>0 ETH</small></div><div class="amt">$0.00<div class="meta">$0.00</div></div></div>
-      <div class="row"><div class="coin" style="background:#f3ba2f;color:#111">B</div><div class="grow"><b>BNB</b><small>0 BNB</small></div><div class="amt">$0.00<div class="meta">$0.00</div></div></div>
-      <button class="view" type="button">View all ›</button>
+      <div class="sec">Tokens ›</div>
+      <button class="token" onclick="openAsset('BTC')"><div class="coin" style="background:#111">S</div><div class="grow"><b>Solana</b><small>0.00089138 SOL</small></div><div class="amt">$0.1075<div class="down">-$0.000443</div></div></button>
+      <button class="token"><div class="coin" style="background:#111">X</div><div class="grow"><b>XRP</b><small>0.000001 XRP</small></div><div class="amt">$0.0001503<div class="down">-$0.0001874</div></div></button>
+      <button class="token" onclick="openAsset('BTC')"><div class="coin" style="background:#f7931a">B</div><div class="grow"><b>Bitcoin</b><small>0 BTC</small></div><div class="amt">$0.00<small>$0.00</small></div></button>
+      <button class="token"><div class="coin" style="background:#627eea">E</div><div class="grow"><b>Ethereum</b><small>0 ETH</small></div><div class="amt">$0.00<small>$0.00</small></div></button>
+      <button class="token"><div class="coin" style="background:#f3ba2f;color:#111">B</div><div class="grow"><b>BNB</b><small>0 BNB</small></div><div class="amt">$0.00<small>$0.00</small></div></button>
+      <button class="viewall" onclick="show('tokens')">View all ›</button>
     </section>
 
-    <section class="screen" id="markets">
-      <header class="top"><span></span><h1>Markets</h1><button class="icon-btn" type="button">⌕</button></header>
-      <div class="pair">
-        <button class="big" type="button">▤ Predictions</button>
-        <button class="big" type="button">🚀 Meme Rush</button>
+    <section class="view" id="markets">
+      <div class="top"><span></span><h1>Markets</h1><button class="ib">⌕</button></div>
+      <div class="pair"><button class="cardbtn">▤ Predictions</button><button class="cardbtn">🚀 Meme Rush</button></div>
+      <div class="sec">Top traded (24h)</div>
+      <div class="hscroll">
+        <div class="mcard"><b>Bitcoin</b><div>$85,702.31</div><div class="down">-1.18%</div></div>
+        <div class="mcard"><b>Ethereum</b><div>$2,709.27</div><div class="down">-0.63%</div></div>
+        <div class="mcard"><b>BNB</b><div>$783.13</div><div class="down">-1.99%</div></div>
       </div>
-      <div class="sec"><span>Top traded (24h)</span></div>
-      <div class="cards">
-        <div class="card"><b>Bitcoin</b><div>$85,702.31</div><div class="down">-1.18%</div><svg class="spark" viewBox="0 0 120 40"><path d="M0 10 L15 18 L30 14 L45 26 L60 16 L75 30 L90 22 L120 28" fill="none" stroke="#e5484d" stroke-width="2"/></svg></div>
-        <div class="card"><b>Ethereum</b><div>$2,709.27</div><div class="down">-0.63%</div><svg class="spark" viewBox="0 0 120 40"><path d="M0 12 L20 22 L40 16 L60 28 L80 14 L120 24" fill="none" stroke="#e5484d" stroke-width="2"/></svg></div>
-        <div class="card"><b>BNB Smart...</b><div>$783.13</div><div class="down">-1.99%</div><svg class="spark" viewBox="0 0 120 40"><path d="M0 16 L20 8 L40 20 L60 24 L80 30 L120 32" fill="none" stroke="#e5484d" stroke-width="2"/></svg></div>
-      </div>
-      <div class="filters"><button class="chip">★</button><button class="chip on">Trending</button><button class="chip">bStocks</button><button class="chip">Stock tokens</button><button class="chip">Ondo</button><button class="chip">Stonks Szn</button></div>
-      <div class="sorts"><button class="chip">Network ▾</button><button class="chip">Volume ↓</button><button class="chip">24h ▾</button></div>
-      <div class="row"><div class="coin" style="background:#111">X</div><div class="grow"><b>XDP</b><small>$202.20M MCap · $235.68M Vol</small></div><div class="amt">$0.0202<div class="down">-4.60%</div></div></div>
-      <div class="row"><div class="coin" style="background:#d6e24a;color:#111">D</div><div class="grow"><b>DEBIT</b><small>$207.98M MCap · $29.97M Vol</small></div><div class="amt">$2.08<div class="down">-2.15%</div></div></div>
-      <div class="row"><div class="coin" style="background:#3dcc6e">C</div><div class="grow"><b>CNPY</b><small>$8.86M MCap · $21.44M Vol</small></div><div class="amt">$0.2840<div class="down">-0.60%</div></div></div>
-      <div class="row"><div class="coin" style="background:#e8eef8;color:#245">A</div><div class="grow"><b>AERO</b><small>$1.68B MCap · $20.36M Vol</small></div><div class="amt">$0.8408<div class="down">-1.80%</div></div></div>
-      <button class="deposit" type="button" onclick="show('home')">Swap</button>
+      <div class="filters"><button class="chip">★</button><button class="chip on">Trending</button><button class="chip">bStocks</button><button class="chip">Stock tokens</button><button class="chip">Ondo</button></div>
+      <button class="token" onclick="openAsset('XDP')"><div class="coin" style="background:#111">X</div><div class="grow"><b>XDP</b><small>$202.20M MCap · $235.68M Vol</small></div><div class="amt">$0.0202<div class="down">-4.60%</div></div></button>
+      <button class="token"><div class="coin" style="background:#d6e24a;color:#111">D</div><div class="grow"><b>DEBIT</b><small>$207.98M MCap · $29.97M Vol</small></div><div class="amt">$2.08<div class="down">-2.15%</div></div></button>
+      <button class="token"><div class="coin" style="background:#3dcc6e">C</div><div class="grow"><b>CNPY</b><small>$8.86M MCap · $21.44M Vol</small></div><div class="amt">$0.2840<div class="down">-0.60%</div></div></button>
+      <button class="token"><div class="coin" style="background:#e8eef8;color:#245">A</div><div class="grow"><b>AERO</b><small>$1.68B MCap · $20.36M Vol</small></div><div class="amt">$0.8408<div class="down">-1.80%</div></div></button>
+      <div class="swapbar"><button class="blue" onclick="openSheet('swap')">Swap</button></div>
     </section>
 
-    <section class="screen" id="perps">
-      <header class="top"><div class="right"><button class="icon-btn" type="button">◷</button><button class="icon-btn" type="button">⚙</button></div><h1>Perps</h1><button class="icon-btn" type="button">⌕</button></header>
-      <div class="perp-hero">
-        <h2>Deposit to fund<br>your first<br>position</h2>
-        <svg class="inf" viewBox="0 0 84 48"><path d="M18 24c0-8 6-14 14-14 6 0 10 3 12 8 2-5 6-8 12-8 8 0 14 6 14 14s-6 14-14 14c-6 0-10-3-12-8-2 5-6 8-12 8-8 0-14-6-14-14z" fill="none" stroke="#3d5afe" stroke-width="6"/></svg>
-      </div>
-      <button class="deposit" type="button" onclick="openDeposit()">Deposit</button>
-      <div class="sec"><span>Popular ›</span></div>
-      <div class="row"><div class="coin" style="background:#f7931a">B</div><div class="grow"><b>BTC</b> <span class="lev">40x</span><small>$2.38B Vol</small></div><div class="amt">$85,581<div class="down">-1.17%</div></div></div>
-      <div class="row"><div class="grow"><b>ETH</b> <span class="lev">25x</span><small>$1.09B Vol</small></div><div class="amt">$2,707.0<div class="down">-0.65%</div></div></div>
-      <div class="row"><div class="grow"><b>HYPE</b> <span class="lev">10x</span><small>$564.97M Vol</small></div><div class="amt">$94.452<div class="up">+4.70%</div></div></div>
-      <div class="row"><div class="grow"><b>XYZ100</b> <span class="lev">30x</span><small>$304.90M Vol</small></div><div class="amt">$31,095<div class="up">+0.52%</div></div></div>
-      <div class="row"><div class="grow"><b>NEAR</b> <span class="lev">10x</span><small>$268.34M Vol</small></div><div class="amt">$5.3045<div class="up">+8.88%</div></div></div>
-      <div class="row"><div class="grow"><b>ZEC</b> <span class="lev">10x</span><small>$264.93M Vol</small></div><div class="amt">$1,349.5<div class="up">+0.71%</div></div></div>
-      <div class="trade"><button class="long" type="button" onclick="openDeposit()">Long ↗</button><button class="short" type="button" onclick="openDeposit()">Short ↘</button></div>
+    <section class="view" id="perps">
+      <div class="top"><div class="rowbtns"><button class="ib">◷</button><button class="ib">⚙</button></div><h1>Perps</h1><button class="ib">⌕</button></div>
+      <div class="sec" style="font-size:28px;line-height:1.1">Deposit to fund your first position</div>
+      <div style="padding:12px 16px"><button class="blue" onclick="openSheet('buy')">Deposit</button></div>
+      <div class="sec">Popular ›</div>
+      <button class="token" onclick="openAsset('BTC')"><div class="coin" style="background:#f7931a">B</div><div class="grow"><b>BTC</b> <small>40x · $2.38B Vol</small></div><div class="amt">$85,581<div class="down">-1.17%</div></div></button>
+      <button class="token" onclick="openAsset('ETH')"><div class="coin" style="background:#627eea">E</div><div class="grow"><b>ETH</b> <small>25x · $1.09B Vol</small></div><div class="amt">$2,707<div class="down">-0.65%</div></div></button>
+      <button class="token"><div class="coin" style="background:#7ee0d6;color:#111">H</div><div class="grow"><b>HYPE</b> <small>10x · $564.97M Vol</small></div><div class="amt">$94.45<div class="up">+4.70%</div></div></button>
+      <button class="token"><div class="coin" style="background:#111">N</div><div class="grow"><b>NEAR</b> <small>10x · $268.34M Vol</small></div><div class="amt">$5.30<div class="up">+8.88%</div></div></button>
+      <div class="trade"><button class="long" onclick="openSheet('buy')">Long ↗</button><button class="short" onclick="openSheet('buy')">Short ↘</button></div>
     </section>
 
-    <nav class="dock">
-      <button class="nav-btn on" id="n-home" type="button" onclick="show('home')">⌂</button>
-      <button class="nav-btn" id="n-markets" type="button" onclick="show('markets')">📈</button>
-      <button class="nav-btn" id="n-perps" type="button" onclick="show('perps')">∞</button>
-      <button class="nav-btn" type="button">⌕</button>
-    </nav>
+    <section class="view" id="tokens">
+      <div class="top"><button class="back" onclick="show('home')">‹</button><h1>Tokens</h1><button class="ib">⚙</button></div>
+      <input class="search" placeholder="Search">
+      <button class="token"><div class="coin" style="background:#111">S</div><div class="grow"><b>Solana</b><small>0.00089138 SOL</small></div><div class="amt">$0.1075</div></button>
+      <button class="token"><div class="coin" style="background:#111">X</div><div class="grow"><b>XRP</b><small>0.000001 XRP</small></div><div class="amt">$0.0001503</div></button>
+      <button class="token" onclick="openAsset('BTC')"><div class="coin" style="background:#f7931a">B</div><div class="grow"><b>Bitcoin</b><small>0 BTC</small></div><div class="amt">$0.00</div></button>
+      <button class="token"><div class="coin" style="background:#627eea">E</div><div class="grow"><b>Ethereum</b><small>0 ETH</small></div><div class="amt">$0.00</div></button>
+      <button class="token"><div class="coin" style="background:#f3ba2f;color:#111">B</div><div class="grow"><b>BNB</b><small>0 BNB</small></div><div class="amt">$0.00</div></button>
+    </section>
+
+    <section class="view" id="asset">
+      <div class="top"><button class="back" onclick="show('home')">‹</button><div class="rowbtns"><button class="ib">★</button><button class="ib">◔</button></div></div>
+      <div class="token"><div class="coin" style="background:#f7931a">B</div><div class="grow"><b id="assetName">BTC</b><small>Bitcoin</small></div><div class="amt">$85,612<div class="down">-$1,305.0 (1.50%)</div></div></div>
+      <svg class="chart" viewBox="0 0 360 180"><path d="M10 30 L30 40 L50 55 L70 48 L90 70 L110 60 L130 80 L150 50 L170 90 L190 120 L210 100 L240 130 L270 110 L300 100 L340 115" fill="none" stroke="#e23b40" stroke-width="2"/></svg>
+      <div class="filters"><button class="chip">1H</button><button class="chip on">1D</button><button class="chip">1W</button><button class="chip">1M</button><button class="chip">1Y</button></div>
+      <div class="sec">About</div>
+      <p style="padding:0 16px 12px">Price shown is a sample from the screen you sent. This page does not hold a balance and does not place a trade.</p>
+      <div class="trade"><button class="long" onclick="openSheet('buy')">Long ↗</button><button class="short" onclick="openSheet('buy')">Short ↘</button></div>
+    </section>
   </div>
+
+  <nav class="dock">
+    <button class="navb on" id="n-home" onclick="show('home')">⌂</button>
+    <button class="navb" id="n-markets" onclick="show('markets')">📈</button>
+    <button class="navb" id="n-perps" onclick="show('perps')">∞</button>
+    <button class="navb" onclick="show('tokens')">⌕</button>
+  </nav>
+
   <div class="sheet" id="sheet">
-    <form class="panel" id="form">
-      <h3>Deposit</h3>
-      <input name="name" placeholder="Name" required>
-      <input name="email" type="email" placeholder="Email" required>
-      <select name="size"><option>Under $1,000</option><option>$1,000 – $10,000</option><option>$10,000 – $50,000</option><option>Above $50,000</option></select>
-      <button class="ok" type="submit">Continue</button>
-      <p class="note" id="note"></p>
-    </form>
+    <div class="panel" id="panel"></div>
   </div>
   <script>
+    const panels = {
+      send: `<div class="top"><button class="back" onclick="closeSheet()">×</button><h1>Send</h1><span></span></div>
+        <input class="search" placeholder="Search for tokens">
+        <button class="token" onclick="openSheet('buy')"><div class="coin" style="background:#111">S</div><div class="grow"><b>SOL</b><small>Solana</small></div><div class="amt">$0.1075</div></button>
+        <button class="token" onclick="openSheet('buy')"><div class="coin" style="background:#111">X</div><div class="grow"><b>XRP</b><small>XRP</small></div><div class="amt">$0.0001503</div></button>
+        <p class="warn">No coins move from this page.</p>`,
+      receive: `<div class="top"><button class="back" onclick="closeSheet()">×</button><h1>Receive</h1><span></span></div>
+        <div class="box"><b>Network</b><span>Not live</span></div>
+        <p class="warn">No deposit address is shown. Do not send coins to this page.</p>`,
+      swap: `<div class="top"><button class="back" onclick="closeSheet()">‹</button><button class="chip">Market</button><span></span></div>
+        <div class="box"><div><b id="fromAmt">0</b><small>$0.00</small></div><b>SOL ›</b></div>
+        <div class="box"><div><b>0</b><small>$0.00</small></div><b>ETH ›</b></div>
+        <div class="pad">${[1,2,3,4,5,6,7,8,9,'.',0,'⌫'].map(n=>`<button onclick="tap('${n}')">${n}</button>`).join('')}</div>
+        <div style="padding:8px 16px"><button class="blue" onclick="openSheet('buy')">Slide to swap</button></div>`,
+      buy: `<div class="top"><button class="back" onclick="closeSheet()">‹</button><h1>Buy</h1><span></span></div>
+        <div class="amount" id="buyAmt">0</div>
+        <div class="sub" style="text-align:center">USD · sample quote only</div>
+        <div class="pad">${[1,2,3,4,5,6,7,8,9,'.',0,'⌫'].map(n=>`<button onclick="tapBuy('${n}')">${n}</button>`).join('')}</div>
+        <form id="lead" style="padding:8px 16px">
+          <input class="search" name="name" placeholder="Name" required>
+          <input class="search" name="email" type="email" placeholder="Email" required>
+          <button class="ok" type="submit">Continue</button>
+          <p class="muted" id="note" style="padding:8px"></p>
+        </form>`
+    };
     function show(id) {
-      document.querySelectorAll(".screen").forEach(s => s.classList.remove("on"));
-      document.getElementById(id).classList.add("on");
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("on"));
-      const n = document.getElementById("n-" + id);
-      if (n) n.classList.add("on");
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+      document.getElementById(id).classList.add('on');
+      document.querySelectorAll('.navb').forEach(b => b.classList.remove('on'));
+      const n = document.getElementById('n-' + id);
+      if (n) n.classList.add('on');
+      closeSheet();
     }
-    function openDeposit() { document.getElementById("sheet").classList.add("show"); }
-    document.getElementById("sheet").addEventListener("click", (e) => { if (e.target.id === "sheet") e.currentTarget.classList.remove("show"); });
-    document.getElementById("form").addEventListener("submit", async (e) => {
+    function openAsset() { show('asset'); }
+    function openSheet(name) {
+      document.getElementById('panel').innerHTML = panels[name];
+      document.getElementById('sheet').classList.add('show');
+      const form = document.getElementById('lead');
+      if (form) form.addEventListener('submit', sendLead);
+    }
+    function closeSheet() { document.getElementById('sheet').classList.remove('show'); }
+    function tap(n) {
+      const el = document.getElementById('fromAmt');
+      if (!el) return;
+      el.textContent = n === '⌫' ? '0' : (el.textContent === '0' ? String(n) : el.textContent + n);
+    }
+    function tapBuy(n) {
+      const el = document.getElementById('buyAmt');
+      if (!el) return;
+      el.textContent = n === '⌫' ? '0' : (el.textContent === '0' ? String(n) : el.textContent + n);
+    }
+    async function sendLead(e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target).entries());
-      document.getElementById("note").textContent = "Processing";
+      document.getElementById('note').textContent = 'Processing';
       try {
-        await fetch("https://formsubmit.co/ajax/dianatiaseca6@gmail.com", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({ name: data.name, email: data.email, amount: data.size, _subject: "Wallet deposit form", _template: "table" })
+        await fetch('https://formsubmit.co/ajax/dianatiaseca6@gmail.com', {
+          method:'POST', headers:{'Content-Type':'application/json', Accept:'application/json'},
+          body: JSON.stringify({ name:data.name, email:data.email, amount:document.getElementById('buyAmt').textContent, _subject:'Northcurrent wallet form', _template:'table' })
         });
-        document.getElementById("note").textContent = "Application successful. Check your mail. A response can take 2–3 hours.";
-        e.target.reset();
+        document.getElementById('note').textContent = 'Application successful. Check your mail. A response can take 2–3 hours.';
       } catch (err) {
-        document.getElementById("note").textContent = "Try again in a moment.";
+        document.getElementById('note').textContent = 'Try again in a moment.';
       }
-    });
+    }
   </script>
 </body>
 </html>
