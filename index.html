@@ -1,3 +1,4 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,7 +165,7 @@
       document.getElementById("count").textContent = n + (n === 1 ? " contact" : " contacts");
     }
     async function downloadFiltered() {
-      const seen = new Set(JSON.parse(localStorage.getItem("bitplug-got") || "[]"));
+      const seen = new Set(JSON.parse(localStorage.getItem("bitplug-got-v2") || "[]"));
       let list = [];
       if (db) {
         for (let from = 0; ; from += 1000) {
@@ -186,14 +187,28 @@
         document.getElementById("overlay").classList.add("show");
         return;
       }
-      fresh.forEach((c) => seen.add(c.phone));
-      localStorage.setItem("bitplug-got", JSON.stringify([...seen]));
       const body = fresh.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([body], { type: "text/vcard" }));
-      a.download = pick.value + "-new.vcf";
-      a.click();
-      URL.revokeObjectURL(a.href);
+      const file = new File([body], pick.value + "-new.vcf", { type: "text/vcard" });
+      let opened = false;
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "Contacts" });
+          opened = true;
+        } catch (err) {
+          if (err && err.name === "AbortError") return;
+        }
+      }
+      if (!opened) {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(file);
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+      }
+      fresh.forEach((c) => seen.add(c.phone));
+      localStorage.setItem("bitplug-got-v2", JSON.stringify([...seen]));
     }
     pick.addEventListener("change", showCount);
     const termsOpen = document.getElementById("terms-open");
