@@ -1,4 +1,3 @@
-Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,6 +66,7 @@ Q
     .filepage .back { border:0; background:transparent; color:#fff; font:inherit; font-weight:700; padding:6px 0; cursor:pointer; }
     .filepage .body { padding:42px 6vw; max-width:640px; width:100%; margin:0 auto; }
     .file { width:100%; display:flex; align-items:center; gap:14px; text-align:left; padding:18px; margin-top:18px; font:inherit; color:inherit; cursor:pointer; box-shadow:0 2px 10px rgba(7,94,84,.08); }
+    .how { margin:20px 0 0 22px; color:var(--ink); font-size:15px; line-height:1.5; display:grid; gap:8px; }
     .file:active { background:var(--chip); }
     .file .ico { flex:none; width:46px; height:56px; border-radius:8px; background:#eaf3ff; border:1px solid #cfe2ff; display:grid; place-items:center; color:#007aff; font-weight:800; font-size:12px; }
     .file b { color:#007aff; font-size:17px; word-break:break-all; }
@@ -98,7 +98,7 @@ Q
     <div class="steps">
       <div class="card"><div class="n">1</div><b>Pick your state</b><p class="copy">Choose the state you are in.</p></div>
       <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that state’s batch.</p></div>
-      <div class="card"><div class="n">3</div><b>Download &amp; open</b><p class="copy">Tap the .vcf file, then choose Contacts.</p></div>
+      <div class="card"><div class="n">3</div><b>Download &amp; open</b><p class="copy">Tap the .vcf file, choose Save to Files, then open it from Files.</p></div>
     </div>
   </section>
 
@@ -111,11 +111,11 @@ Q
   <section>
     <div class="kicker">SAVE IT</div>
     <h2>Download, then add to contacts.</h2>
-    <p class="copy">Tap Download, then tap the .vcf file. The share sheet opens straight away. Choose Contacts, then Add All.</p>
+    <p class="copy">Tap Download, then tap the .vcf file. In the share sheet choose Save to Files, then open the file from Files and tap Add All.</p>
     <!-- Optional screenshots: upload step1.jpg / step2.jpg / step3.jpg into an "img" folder in your repo. Missing images simply hide. -->
     <div class="shots" id="shots">
       <figure><img src="img/step1.jpg" alt="Tap Download" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>1. Tap Download this .vcf</figcaption></figure>
-      <figure><img src="img/step2.jpg" alt="Review the list and tap Save" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>2. Tap the .vcf file</figcaption></figure>
+      <figure><img src="img/step2.jpg" alt="Review the list and tap Save" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>2. Tap the file, choose Save to Files</figcaption></figure>
       <figure><img src="img/step3.jpg" alt="Choose Contacts" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>3. Choose Contacts</figcaption></figure>
     </div>
   </section>
@@ -179,11 +179,17 @@ Q
     <div class="body">
       <div class="kicker">YOUR FILE</div>
       <h2>Tap the file</h2>
-      <p class="copy" style="margin-bottom:0">The share sheet opens right away. Tap <b>Contacts</b>, then <b>Add All</b>.</p>
+      <p class="copy" style="margin-bottom:0">The share sheet opens right away.</p>
       <button class="card file" id="vcf-file" type="button">
         <span class="ico">VCF</span>
         <span><b id="vcf-name">contacts.vcf</b><p id="vcf-meta">Contact card</p></span>
       </button>
+      <ol class="how">
+        <li>Tap the file above</li>
+        <li>In the share sheet, tap <b>Save to Files</b>, then <b>Save</b></li>
+        <li>Open the <b>Files</b> app and tap the file</li>
+        <li>Tap <b>Add All</b>, then <b>Save</b></li>
+      </ol>
       <p class="inapp" id="inapp">Share sheet isn't available in this browser. Tap the file to download it, or open this page in Safari.</p>
     </div>
   </div>
