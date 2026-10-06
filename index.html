@@ -111,7 +111,7 @@
         <label for="pick">City</label>
         <select id="pick"></select>
         <p class="count" id="count">0 contacts</p>
-        <div class="actions"><button class="btn" type="button" onclick="openDownload()">Download this .vcf</button></div>
+        <div class="actions"><button class="btn" type="button" onclick="downloadFiltered()">Download this .vcf</button></div>
       </div>
     </div>
   </section>
@@ -134,10 +134,6 @@
       <p class="copy" id="note-copy">The number is in that city’s batch.</p>
       <p class="copy" id="note-extra">Remember to come back here later to download your vcf 👍</p>
       <button class="btn" type="button" onclick="document.getElementById('overlay').classList.remove('show')">Close</button>
-      <div id="dl-choices" style="display:none;gap:10px;margin-top:14px">
-        <button class="btn" type="button" onclick="downloadChoice('all')">Download all</button>
-        <button class="btn" type="button" onclick="downloadChoice('new')">New contacts only</button>
-      </div>
     </div>
   </div>
   <script>
@@ -204,20 +200,26 @@
       list.forEach((c) => seen.add(c.phone));
       localStorage.setItem("bitplug-got-v2", JSON.stringify([...seen]));
     }
-    function openDownload() {
-      document.getElementById("note-title").textContent = "Download";
-      document.getElementById("note-copy").textContent = "Get the whole file, or only contacts you have not downloaded.";
-      document.getElementById("note-extra").style.display = "none";
-      document.getElementById("overlay").classList.add("show");
-      document.getElementById("dl-choices").style.display = "grid";
-    }
-    async function downloadChoice(mode) {
-      document.getElementById("dl-choices").style.display = "none";
-      document.getElementById("overlay").classList.remove("show");
+    async function downloadFiltered() {
       const list = await loadBatch();
-      if (mode === "all") return saveFile(list, pick.value + ".vcf");
-      const seen = new Set(JSON.parse(localStorage.getItem("bitplug-got-v2") || "[]"));
-      saveFile(list.filter((c) => c.phone && !seen.has(c.phone)), pick.value + "-new.vcf");
+      if (!list.length) {
+        document.getElementById("note-title").textContent = "No contacts";
+        document.getElementById("note-copy").textContent = "Nothing in this batch yet.";
+        document.getElementById("note-extra").style.display = "none";
+        document.getElementById("overlay").classList.add("show");
+        return;
+      }
+      const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
+      const file = new File([body], pick.value + ".vcf", { type: "text/vcard" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: "Contacts" }); return; } catch (err) { if (err && err.name === "AbortError") return; }
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(file);
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
     pick.addEventListener("change", showCount);
     const termsOpen = document.getElementById("terms-open");
@@ -247,7 +249,6 @@
       document.getElementById("note-title").textContent = "Saved successfully";
       document.getElementById("note-copy").textContent = "The number is in that city’s batch.";
       document.getElementById("note-extra").style.display = "block";
-      document.getElementById("dl-choices").style.display = "none";
       document.getElementById("overlay").classList.add("show");
       e.target.reset();
       if (db) {
@@ -276,6 +277,10 @@
     showCount();
   </script>
 <div class="viewer" id="viewer" onclick="this.classList.remove('show')"><img id="viewer-img" alt=""></div>
+<script>document.querySelectorAll('.shots img').forEach(img=>img.addEventListener('click',()=>{document.getElementById('viewer-img').src=img.src;document.getElementById('viewer').classList.add('show');}));</script>
+</body>
+</html>
+sList.remove('show')"><img id="viewer-img" alt=""></div>
 <script>document.querySelectorAll('.shots img').forEach(img=>img.addEventListener('click',()=>{document.getElementById('viewer-img').src=img.src;document.getElementById('viewer').classList.add('show');}));</script>
 </body>
 </html>
