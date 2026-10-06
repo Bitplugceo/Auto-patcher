@@ -57,7 +57,9 @@
     .tip { color:var(--muted); font-size:13px; margin-top:12px; }
     .inapp { display:none; background:#fff6e0; color:#7a5a00; border-radius:12px; padding:10px 12px; font-size:13px; margin-top:10px; }
     .shots { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
-    .shots figure { margin:0; }
+    .shots figure { margin:0; position:relative; }
+    .shots figure::before { content:counter(shot); counter-increment:shot; position:absolute; top:6px; left:6px; width:18px; height:18px; border-radius:50%; background:#075e54; color:#fff; font-size:11px; font-weight:800; display:grid; place-items:center; z-index:1; }
+    .shots { counter-reset:shot; }
     .shots img { width:100%; height:132px; object-fit:cover; object-position:top; border-radius:12px; border:1px solid var(--line); display:block; }
     .shots figcaption { color:var(--muted); font-size:11px; margin-top:6px; line-height:1.3; }
     .filepage { position:fixed; inset:0; z-index:8; background:#fff; display:none; flex-direction:column; overflow:auto; padding-bottom:env(safe-area-inset-bottom); }
@@ -71,9 +73,12 @@
     .file .ico { flex:none; width:46px; height:56px; border-radius:8px; background:#eaf3ff; border:1px solid #cfe2ff; display:grid; place-items:center; color:#007aff; font-weight:800; font-size:12px; }
     .file b { color:#007aff; font-size:17px; word-break:break-all; }
     .file p { margin:4px 0 0; color:var(--muted); font-size:14px; }
-    .viewer { position:fixed; inset:0; background:#111; display:none; z-index:20; }
-    .viewer.show { display:block; }
+    .viewer { position:fixed; inset:0; background:#111; display:none; align-items:center; justify-content:center; z-index:20; overflow:hidden; }
+    .viewer.show { display:flex; }
     .viewer-back { position:absolute; top:14px; left:14px; z-index:3; border:0; background:rgba(0,0,0,.72); color:#fff; border-radius:999px; padding:8px 14px; font:inherit; font-weight:700; }
+    .viewer img { width:240px; height:auto; display:block; }
+    .viewer .shot { position:relative; }
+    .viewer-num { position:absolute; top:6px; left:6px; width:18px; height:18px; border-radius:50%; background:#075e54; color:#fff; font-size:11px; font-weight:800; display:grid; place-items:center; }
     .reel { height:100%; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
     .reel .slide { flex:none; width:100%; height:100%; overflow-y:auto; scroll-snap-align:start; -webkit-overflow-scrolling:touch; }
     .reel img { width:100%; height:auto; display:block; }
@@ -137,7 +142,7 @@
         <label for="name">Name</label>
         <input id="name" name="name" placeholder="TheBetCeo" maxlength="40" autocomplete="name" required>
         <label for="phone">Number</label>
-        <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="08031234567 or +2348031234567" autocomplete="tel" required>
+        <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="07069260719" autocomplete="tel" required>
         <label for="city">Your state</label>
         <select id="city"></select>
         <div class="actions"><button class="btn" id="save-btn" type="submit">Save contact</button></div>
@@ -205,7 +210,7 @@
 
   <div class="viewer" id="viewer">
     <button type="button" class="viewer-back" id="viewer-back">← Back</button>
-    <img id="viewer-img" alt="">
+    <div class="shot"><span class="viewer-num" id="viewer-num">1</span><img id="viewer-img" alt=""></div>
   </div>
 
   <script>
@@ -460,8 +465,9 @@
     });
 
     // ---------- screenshot viewer ----------
-    document.querySelectorAll(".shots img").forEach((img) => img.addEventListener("click", () => {
+    document.querySelectorAll(".shots img").forEach((img, i) => img.addEventListener("click", () => {
       $("viewer-img").src = img.src;
+      $("viewer-num").textContent = i + 1;
       $("viewer").classList.add("show");
     }));
     $("viewer-back").addEventListener("click", () => $("viewer").classList.remove("show"));
