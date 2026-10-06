@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BITPLUG CEO</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root { --green:#25d366; --deep:#075e54; --ink:#111b21; --muted:#667781; --line:#e6eeea; --chip:#f4f7f6; }
     * { box-sizing:border-box; margin:0; padding:0; }
@@ -53,7 +54,7 @@
   <section>
     <div class="kicker">BATCHES</div>
     <h2>How the files split.</h2>
-    <div class="batches">
+    <div class="batches" id="batches">
       <article class="card"><b>Lagos</b><p class="copy">Batch 1 · 40 of 50</p><div class="bar"><span style="width:80%"></span></div></article>
       <article class="card"><b>Oyo</b><p class="copy">Batch 1 · 18 of 50</p><div class="bar"><span style="width:36%"></span></div></article>
       <article class="card"><b>FCT</b><p class="copy">Batch 1 · 7 of 50</p><div class="bar"><span style="width:14%"></span></div></article>
@@ -78,30 +79,36 @@
         <label for="pick">Your city</label>
         <select id="pick"></select>
         <div id="list"></div>
-        <button class="btn short" style="margin-top:14px" type="button" onclick="downloadFiltered()">Download this .vcf</button>
+        <button class="btn" style="margin-top:14px" type="button" onclick="downloadFiltered()">Download this .vcf</button>
       </div>
     </div>
   </section>
   <script>
+    const NC = { url: "https://YOUR.supabase.co", key: "YOUR_ANON_KEY" };
     const states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","FCT"];
     const city = document.getElementById("city");
     const pick = document.getElementById("pick");
     states.forEach((s) => city.add(new Option(s, s)));
     pick.add(new Option("All", "all"));
     states.forEach((s) => pick.add(new Option(s, s)));
+    const ready = NC.url.indexOf("YOUR") === -1 && NC.key.indexOf("YOUR") === -1;
+    const db = ready ? supabase.createClient(NC.url, NC.key) : null;
     const key = "bitplug-contacts";
-    const load = () => JSON.parse(localStorage.getItem(key) || "[]");
-    const save = (list) => localStorage.setItem(key, JSON.stringify(list));
-    function shown() {
-      const list = load();
-      return pick.value === "all" ? list : list.filter((c) => c.city === pick.value);
+    const localLoad = () => JSON.parse(localStorage.getItem(key) || "[]");
+    const localSave = (list) => localStorage.setItem(key, JSON.stringify(list));
+    async function loadAll() {
+      if (!db) return localLoad();
+      const { data, error } = await db.from("contacts").select("name,phone,city").order("id", { ascending: true });
+      if (error) return localLoad();
+      return data || [];
     }
-    function render() {
-      const list = shown();
+    function shown(list) { return pick.value === "all" ? list : list.filter((c) => c.city === pick.value); }
+    function renderList(list) {
+      const rows = shown(list);
       const box = document.getElementById("list");
       box.innerHTML = "";
-      if (!list.length) { box.innerHTML = "<p class='empty'>Nothing in this batch yet.</p>"; return; }
-      list.forEach((c) => {
+      if (!rows.length) { box.innerHTML = "<p class='empty'>Nothing in this batch yet.</p>"; return; }
+      rows.forEach((c) => {
         const row = document.createElement("div");
         row.className = "person";
         const left = document.createElement("div");
@@ -114,26 +121,26 @@
         box.appendChild(row);
       });
     }
-    function downloadFiltered() {
-      const list = shown();
+    async function downloadFiltered() {
+      const list = shown(await loadAll());
       if (!list.length) return;
       const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([body], { type:"text/vcard" }));
+      a.href = URL.createObjectURL(new Blob([body], { type: "text/vcard" }));
       a.download = pick.value + ".vcf";
       a.click();
       URL.revokeObjectURL(a.href);
     }
-    pick.addEventListener("change", render);
-    document.getElementById("form").addEventListener("submit", (e) => {
+    pick.addEventListener("change", async () => renderList(await loadAll()));
+    document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const list = load();
-      list.push({ name: document.getElementById("name").value.trim(), phone: document.getElementById("phone").value.trim(), city: city.value });
-      save(list);
+      const row = { name: document.getElementById("name").value.trim(), phone: document.getElementById("phone").value.trim(), city: city.value };
+      if (db) await db.from("contacts").insert(row);
+      else { const list = localLoad(); list.push(row); localSave(list); }
       e.target.reset();
-      render();
+      renderList(await loadAll());
     });
-    render();
+    loadAll().then(renderList);
   </script>
 </body>
 </html>
