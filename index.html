@@ -33,6 +33,12 @@
     .person { display:flex; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid var(--line); }
     .person span, .empty { color:var(--muted); font-size:13px; }
     .actions { text-align:center; margin-top:16px; }
+    .count { color:var(--muted); font-size:13px; text-align:center; margin-top:12px; }
+    .kicker { color:var(--deep); font-size:12px; font-weight:800; letter-spacing:.12em; }
+    .overlay { position:fixed; inset:0; background:rgba(7,94,84,.35); display:none; align-items:center; justify-content:center; padding:24px; z-index:5; }
+    .overlay.show { display:flex; }
+    .sheet { width:min(420px,100%); background:#fff; border-radius:22px; padding:32px 22px; text-align:center; }
+    .sheet h3 { font-size:34px; letter-spacing:-.5px; margin:8px 0; }
     @media (max-width:800px) { .steps, .batches { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -78,11 +84,19 @@
         <h2>Pick a batch</h2>
         <label for="pick">Your city</label>
         <select id="pick"></select>
-        <div id="list"></div>
+        <p class="count" id="count">0 contacts</p>
         <div class="actions"><button class="btn" type="button" onclick="downloadFiltered()">Download this .vcf</button></div>
       </div>
     </div>
   </section>
+  <div class="overlay" id="overlay">
+    <div class="sheet">
+      <div class="kicker">DONE</div>
+      <h3>Saved successfully</h3>
+      <p class="copy">The number is in that city’s batch.</p>
+      <button class="btn" type="button" onclick="document.getElementById('overlay').classList.remove('show')">Close</button>
+    </div>
+  </div>
   <script>
     const NC = { url: "https://frvajexelqybambebyno.supabase.co", key: "sb_publishable_C4r6K4LxXccnppbVvYuqpA_AVmwl6vj" };
     const states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","FCT"];
@@ -96,33 +110,26 @@
     const key = "bitplug-contacts";
     const localLoad = () => JSON.parse(localStorage.getItem(key) || "[]");
     const localSave = (list) => localStorage.setItem(key, JSON.stringify(list));
-    async function loadAll() {
-      if (!db) return localLoad();
-      let q = db.from("contacts").select("name,phone,city").order("id", { ascending: true });
+    async function loadCount() {
+      if (!db) {
+        const list = localLoad();
+        return pick.value === "all" ? list.length : list.filter((c) => c.city === pick.value).length;
+      }
+      let q = db.from("contacts").select("id", { count: "exact", head: true });
       if (pick.value !== "all") q = q.eq("city", pick.value);
-      const { data, error } = await q;
-      if (error) return localLoad();
-      return data || [];
+      const { count } = await q;
+      return count || 0;
     }
-    function renderList(list) {
-      const box = document.getElementById("list");
-      box.innerHTML = "";
-      if (!list.length) { box.innerHTML = "<p class='empty'>Nothing in this batch yet.</p>"; return; }
-      list.forEach((c) => {
-        const row = document.createElement("div");
-        row.className = "person";
-        const left = document.createElement("div");
-        const b = document.createElement("b");
-        b.textContent = c.name;
-        const s = document.createElement("span");
-        s.textContent = c.city + " · " + c.phone;
-        left.append(b, s);
-        row.appendChild(left);
-        box.appendChild(row);
-      });
+    async function showCount() {
+      const n = await loadCount();
+      document.getElementById("count").textContent = n + (n === 1 ? " contact" : " contacts");
     }
     async function downloadFiltered() {
-      const list = await loadAll();
+      if (!db) return;
+      let q = db.from("contacts").select("name,phone,city").order("id", { ascending: true });
+      if (pick.value !== "all") q = q.eq("city", pick.value);
+      const { data } = await q;
+      const list = data || [];
       if (!list.length) return;
       const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
@@ -131,7 +138,7 @@
       a.click();
       URL.revokeObjectURL(a.href);
     }
-    pick.addEventListener("change", async () => renderList(await loadAll()));
+    pick.addEventListener("change", showCount);
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
@@ -147,12 +154,19 @@
       }
       phoneEl.setCustomValidity("");
       const row = { name: document.getElementById("name").value.trim(), phone, city: city.value };
-      if (db) await db.from("contacts").insert(row);
-      else { const list = localLoad(); list.push(row); localSave(list); }
+      if (db) {
+        const { error } = await db.from("contacts").insert(row);
+        if (error) return;
+      } else {
+        const list = localLoad();
+        list.push(row);
+        localSave(list);
+      }
       e.target.reset();
-      renderList(await loadAll());
+      document.getElementById("overlay").classList.add("show");
+      showCount();
     });
-    loadAll().then(renderList);
+    showCount();
   </script>
 </body>
 </html>
