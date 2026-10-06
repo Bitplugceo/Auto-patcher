@@ -1,3 +1,4 @@
+Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,11 +9,10 @@
     :root { --green:#25d366; --deep:#075e54; --ink:#111b21; --muted:#667781; --line:#e6eeea; --chip:#f4f7f6; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#fff; color:var(--ink); }
-    header { position:sticky; top:0; z-index:2; background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:14px 6vw; }
-    .logo { font-weight:800; font-size:20px; letter-spacing:.04em; }
+    header { position:sticky; top:0; z-index:2; background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:14px 6vw; gap:12px; }
+    .logo { font-weight:800; font-size:18px; letter-spacing:.04em; }
     a { color:inherit; text-decoration:none; }
     .btn { border:0; background:var(--green); color:#fff; border-radius:999px; padding:12px 16px; font:inherit; font-weight:700; }
-    .ghost { background:#fff; color:var(--deep); border:1px solid var(--line); }
     section { padding:42px 6vw; }
     .hero { background:linear-gradient(#e9f9ef,#fff 70%); }
     h1 { font-size:clamp(40px,8vw,68px); line-height:.95; letter-spacing:-1.4px; }
@@ -39,16 +39,16 @@
 <body>
   <header>
     <div class="logo">BITPLUG CEO</div>
-    <a class="btn" href="#add">Add a number</a>
+    <a class="btn" href="https://wa.me/2347069260719">Contact owner</a>
   </header>
   <section class="hero">
-    <h1>Numbers, sorted by city.</h1>
-    <p class="copy">People drop a name and a number, pick Lagos or Ibadan, and the card grows in batches. When a batch is ready, download that city or the whole file.</p>
-    <div class="pills"><span class="pill">Lagos</span><span class="pill">Ibadan</span><span class="pill">Abuja</span><span class="pill">Port Harcourt</span><span class="pill">All cities</span></div>
+    <h1>Numbers, sorted by state.</h1>
+    <p class="copy">People drop a name and a number, pick their own state, and the card grows in batches. Download one state, or the whole file.</p>
+    <div class="pills"><span class="pill">Lagos</span><span class="pill">Oyo</span><span class="pill">Rivers</span><span class="pill">Kano</span><span class="pill">All states</span></div>
     <div class="steps">
-      <div class="card"><div class="n">1</div><b>Pick a place</b><p class="copy">Lagos, Ibadan, or another city on the list.</p></div>
-      <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that city’s batch.</p></div>
-      <div class="card"><div class="n">3</div><b>Download the card</b><p class="copy">One city, or every contact in one .vcf.</p></div>
+      <div class="card"><div class="n">1</div><b>Pick your state</b><p class="copy">Choose the state you are in.</p></div>
+      <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that state’s batch.</p></div>
+      <div class="card"><div class="n">3</div><b>Download the card</b><p class="copy">One state, or every contact in one .vcf.</p></div>
     </div>
   </section>
   <section>
@@ -56,8 +56,8 @@
     <h2>How the files split.</h2>
     <div class="batches">
       <article class="card"><b>Lagos</b><p class="copy">Batch 1 · 40 of 50</p><div class="bar"><span style="width:80%"></span></div></article>
-      <article class="card"><b>Ibadan</b><p class="copy">Batch 1 · 18 of 50</p><div class="bar"><span style="width:36%"></span></div></article>
-      <article class="card"><b>Abuja</b><p class="copy">Batch 1 · 7 of 50</p><div class="bar"><span style="width:14%"></span></div></article>
+      <article class="card"><b>Oyo</b><p class="copy">Batch 1 · 18 of 50</p><div class="bar"><span style="width:36%"></span></div></article>
+      <article class="card"><b>FCT</b><p class="copy">Batch 1 · 7 of 50</p><div class="bar"><span style="width:14%"></span></div></article>
     </div>
   </section>
   <section id="add">
@@ -69,33 +69,33 @@
         <input id="name" placeholder="Ada Cole" required>
         <label for="phone">Number</label>
         <input id="phone" type="tel" placeholder="+234 800 000 0000" required>
-        <label for="city">City</label>
-        <select id="city">
-          <option>Lagos</option><option>Ibadan</option><option>Abuja</option><option>Port Harcourt</option><option>Kano</option><option>Enugu</option><option>Benin</option>
-        </select>
+        <label for="city">Your city</label>
+        <select id="city"></select>
         <button class="btn" style="width:100%;margin-top:16px" type="submit">Save contact</button>
       </form>
       <div class="card">
         <div class="kicker">DOWNLOAD</div>
         <h2>Pick a batch</h2>
-        <label for="pick">City</label>
-        <select id="pick">
-          <option value="all">All</option>
-          <option>Lagos</option><option>Ibadan</option><option>Abuja</option><option>Port Harcourt</option><option>Kano</option><option>Enugu</option><option>Benin</option>
-        </select>
+        <label for="pick">Your city</label>
+        <select id="pick"></select>
         <div id="list"></div>
         <button class="btn" style="width:100%;margin-top:14px" type="button" onclick="downloadFiltered()">Download this .vcf</button>
       </div>
     </div>
   </section>
   <script>
+    const states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","FCT"];
+    const city = document.getElementById("city");
+    const pick = document.getElementById("pick");
+    states.forEach((s) => city.add(new Option(s, s)));
+    pick.add(new Option("All", "all"));
+    states.forEach((s) => pick.add(new Option(s, s)));
     const key = "bitplug-contacts";
     const load = () => JSON.parse(localStorage.getItem(key) || "[]");
     const save = (list) => localStorage.setItem(key, JSON.stringify(list));
     function shown() {
       const list = load();
-      const pick = document.getElementById("pick").value;
-      return pick === "all" ? list : list.filter((c) => c.city === pick);
+      return pick.value === "all" ? list : list.filter((c) => c.city === pick.value);
     }
     function render() {
       const list = shown();
@@ -118,19 +118,18 @@
     function downloadFiltered() {
       const list = shown();
       if (!list.length) return;
-      const pick = document.getElementById("pick").value;
       const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([body], { type:"text/vcard" }));
-      a.download = pick + ".vcf";
+      a.download = pick.value + ".vcf";
       a.click();
       URL.revokeObjectURL(a.href);
     }
-    document.getElementById("pick").addEventListener("change", render);
+    pick.addEventListener("change", render);
     document.getElementById("form").addEventListener("submit", (e) => {
       e.preventDefault();
       const list = load();
-      list.push({ name: document.getElementById("name").value.trim(), phone: document.getElementById("phone").value.trim(), city: document.getElementById("city").value });
+      list.push({ name: document.getElementById("name").value.trim(), phone: document.getElementById("phone").value.trim(), city: city.value });
       save(list);
       e.target.reset();
       render();
