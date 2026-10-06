@@ -1,4 +1,3 @@
-S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,9 +71,11 @@ S
     .file .ico { flex:none; width:46px; height:56px; border-radius:8px; background:#eaf3ff; border:1px solid #cfe2ff; display:grid; place-items:center; color:#007aff; font-weight:800; font-size:12px; }
     .file b { color:#007aff; font-size:17px; word-break:break-all; }
     .file p { margin:4px 0 0; color:var(--muted); font-size:14px; }
-    .viewer { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:9; padding:16px; }
+    .viewer { position:fixed; inset:0; background:rgba(0,0,0,.88); display:none; align-items:center; justify-content:center; z-index:20; padding:16px; }
     .viewer.show { display:flex; }
-    .viewer img { max-width:100%; max-height:92vh; border-radius:12px; }
+    .viewer .frame { position:relative; max-width:100%; max-height:92vh; margin:auto; }
+    .viewer img { max-width:100%; max-height:92vh; width:auto; height:auto; object-fit:contain; border-radius:12px; display:block; }
+    .hint { position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:2; margin:0; background:rgba(0,0,0,.78); color:#fff; font-size:13px; border-radius:999px; padding:8px 12px; white-space:nowrap; }
     @media (max-width:800px) { .steps { grid-template-columns:1fr; } .shots { grid-template-columns:repeat(2,1fr); } }
   </style>
 </head>
@@ -196,7 +197,7 @@ S
     </div>
   </div>
 
-  <div class="viewer" id="viewer"><p class="hint" id="viewer-hint">Tap on the image to return</p><img id="viewer-img" alt=""></div>
+  <div class="viewer" id="viewer"><div class="frame"><p class="hint" id="viewer-hint">Tap on the image to return</p><img id="viewer-img" alt=""></div></div>
 
   <script>
     // ---------- config ----------
