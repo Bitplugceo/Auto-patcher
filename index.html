@@ -1,3 +1,4 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,10 +83,12 @@
     .reel { height:100%; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
     .reel .slide { flex:none; width:100%; height:100%; overflow-y:auto; scroll-snap-align:start; -webkit-overflow-scrolling:touch; }
     .reel img { width:100%; height:auto; display:block; }
+    .refresh { position:fixed; top:72px; right:14px; z-index:6; width:42px; height:42px; border:0; border-radius:50%; background:#075e54; color:#fff; font-size:20px; box-shadow:0 4px 14px rgba(0,0,0,.2); touch-action:none; }
     @media (max-width:800px) { .steps { grid-template-columns:1fr; } .shots { grid-template-columns:repeat(2,1fr); } }
   </style>
 </head>
 <body>
+  <button type="button" class="refresh" id="refresh" aria-label="Refresh">↻</button>
   <header>
     <div class="logo">BITPLUG CEO</div>
     <a class="btn" href="https://wa.me/2347069260719">Contact owner</a>
@@ -484,8 +487,31 @@
     $("viewer-back").addEventListener("click", () => $("viewer").classList.remove("show"));
 
     // ---------- init ----------
+    const refresh = $("refresh");
+    const savedPos = store.get("bitplug-refresh");
+    if (savedPos) { try { const p = JSON.parse(savedPos); refresh.style.top = p.top; refresh.style.left = p.left; refresh.style.right = "auto"; } catch (e) {} }
+    let dragging = false, moved = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    refresh.addEventListener("pointerdown", (e) => {
+      dragging = true; moved = false;
+      const r = refresh.getBoundingClientRect();
+      sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
+      refresh.setPointerCapture(e.pointerId);
+    });
+    refresh.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+      refresh.style.left = Math.max(8, Math.min(window.innerWidth - 50, ox + dx)) + "px";
+      refresh.style.top = Math.max(8, Math.min(window.innerHeight - 50, oy + dy)) + "px";
+      refresh.style.right = "auto";
+    });
+    refresh.addEventListener("pointerup", () => {
+      dragging = false;
+      if (moved) store.set("bitplug-refresh", JSON.stringify({ top: refresh.style.top, left: refresh.style.left }));
+      else location.reload();
+    });
+
     showCount();
-    renderBatches();
   </script>
 </body>
 </html>
