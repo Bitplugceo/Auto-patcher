@@ -1,3 +1,4 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,11 +72,12 @@
     .file .ico { flex:none; width:46px; height:56px; border-radius:8px; background:#eaf3ff; border:1px solid #cfe2ff; display:grid; place-items:center; color:#007aff; font-weight:800; font-size:12px; }
     .file b { color:#007aff; font-size:17px; word-break:break-all; }
     .file p { margin:4px 0 0; color:var(--muted); font-size:14px; }
-    .viewer { position:fixed; inset:0; background:rgba(0,0,0,.88); display:none; z-index:20; }
+    .viewer { position:fixed; inset:0; background:#111; display:none; z-index:20; }
     .viewer.show { display:block; }
+    .viewer-back { position:absolute; top:14px; left:14px; z-index:3; border:0; background:rgba(0,0,0,.72); color:#fff; border-radius:999px; padding:8px 14px; font:inherit; font-weight:700; }
     .reel { height:100%; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
-    .reel img { flex:none; width:100%; height:100%; object-fit:contain; scroll-snap-align:center; }
-    .hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2; margin:0; background:rgba(0,0,0,.78); color:#fff; font-size:13px; border-radius:999px; padding:8px 12px; white-space:nowrap; pointer-events:none; }
+    .reel .slide { flex:none; width:100%; height:100%; overflow-y:auto; scroll-snap-align:start; -webkit-overflow-scrolling:touch; }
+    .reel img { width:100%; height:auto; display:block; }
     @media (max-width:800px) { .steps { grid-template-columns:1fr; } .shots { grid-template-columns:repeat(2,1fr); } }
   </style>
 </head>
@@ -107,7 +109,11 @@
   <section>
     <div class="kicker">BATCHES</div>
     <h2>How the files split.</h2>
-    <div class="batches" id="batches"></div>
+    <div class="batches" id="batches">
+      <article class="card batch"><b>Lagos</b><p class="copy">Batch 1 · 40 of 50</p><div class="bar"><span style="width:80%"></span></div></article>
+      <article class="card batch"><b>Oyo</b><p class="copy">Batch 1 · 18 of 50</p><div class="bar"><span style="width:36%"></span></div></article>
+      <article class="card batch"><b>FCT</b><p class="copy">Batch 1 · 7 of 50</p><div class="bar"><span style="width:14%"></span></div></article>
+    </div>
   </section>
 
   <section>
@@ -199,7 +205,7 @@
   </div>
 
   <div class="viewer" id="viewer">
-    <p class="hint" id="viewer-hint">Tap on the image to return</p>
+    <button type="button" class="viewer-back" id="viewer-back">← Back</button>
     <div class="reel" id="viewer-reel"></div>
   </div>
 
@@ -328,36 +334,7 @@
     }));
     pick.addEventListener("change", () => { syncPills(); showCount(); });
 
-    async function renderBatches() {
-      const counts = await Promise.all(featured.map(countFor));
-      const box = $("batches");
-      box.textContent = "";
-      featured.forEach((s, i) => {
-        const n = counts[i];
-        const card = document.createElement("article");
-        card.className = "card batch";
-        const b = document.createElement("b");
-        b.textContent = s;
-        const p = document.createElement("p");
-        p.className = "copy";
-        const bar = document.createElement("div");
-        bar.className = "bar";
-        const fill = document.createElement("span");
-        if (n === null) {
-          p.textContent = "Unavailable";
-          fill.style.width = "0%";
-        } else {
-          const batchNo = Math.max(1, Math.ceil(n / BATCH));
-          const inBatch = n - (batchNo - 1) * BATCH;
-          p.textContent = "Batch " + batchNo + " · " + inBatch + " of " + BATCH;
-          fill.style.width = Math.min(100, (inBatch / BATCH) * 100) + "%";
-        }
-        bar.appendChild(fill);
-        card.append(b, p, bar);
-        card.addEventListener("click", () => { choose(s); $("add").scrollIntoView({ behavior: "smooth" }); });
-        box.appendChild(card);
-      });
-    }
+    async function renderBatches() {}
 
     // ---------- file page, then share ----------
     let current = [];
@@ -483,25 +460,17 @@
 
     // ---------- screenshot viewer ----------
     const reel = $("viewer-reel");
-    document.querySelectorAll(".shots img").forEach((img) => reel.appendChild(img.cloneNode()));
+    document.querySelectorAll(".shots img").forEach((img) => {
+      const slide = document.createElement("div");
+      slide.className = "slide";
+      slide.appendChild(img.cloneNode());
+      reel.appendChild(slide);
+    });
     document.querySelectorAll(".shots img").forEach((img) => img.addEventListener("click", () => {
-      const hint = $("viewer-hint");
-      hint.style.display = "block";
       $("viewer").classList.add("show");
       reel.scrollLeft = 0;
-      setTimeout(() => { hint.style.display = "none"; }, 2000);
     }));
-    $("viewer").addEventListener("click", () => $("viewer").classList.remove("show"));
-    let atEnd = false;
-    reel.addEventListener("scroll", () => {
-      const last = reel.scrollWidth - reel.clientWidth - 8;
-      const ended = reel.scrollLeft >= last && reel.scrollLeft > 20;
-      if (ended && !atEnd) {
-        atEnd = true;
-        setTimeout(() => { if (atEnd) $("viewer").classList.remove("show"); }, 700);
-      }
-      if (!ended) atEnd = false;
-    });
+    $("viewer-back").addEventListener("click", () => $("viewer").classList.remove("show"));
 
     // ---------- init ----------
     showCount();
