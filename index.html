@@ -18,7 +18,8 @@
     h1 { font-size:clamp(40px,8vw,68px); line-height:.95; letter-spacing:-1.4px; }
     h2 { font-size:32px; letter-spacing:-.5px; margin-bottom:8px; }
     .copy { color:var(--muted); max-width:620px; margin:14px 0 22px; font-size:17px; }
-    .read { margin-top:10px; border:0; background:transparent; color:var(--deep); font:inherit; font-size:13px; font-weight:700; padding:0; }
+    .pills-wrap { position:relative; margin-top:28px; }
+    .read { position:absolute; right:6px; top:-20px; border:0; background:transparent; color:var(--deep); font:inherit; font-size:13px; font-weight:700; padding:0; }
     .pills { display:flex; gap:8px; flex-wrap:wrap; }
     .pill { background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-size:14px; }
     .steps, .batches { display:grid; gap:14px; }
@@ -61,8 +62,10 @@
   </header>
   <section class="hero">
     <h1>Numbers sorted by states</h1>
-    <button type="button" class="read" id="terms-open">Read note</button>
-    <div class="pills"><span class="pill">Lagos</span><span class="pill">Oyo</span><span class="pill">Rivers</span><span class="pill">Kano</span><span class="pill">All states</span></div>
+    <div class="pills-wrap">
+      <button type="button" class="read" id="terms-open">Read note again</button>
+      <div class="pills"><span class="pill">Lagos</span><span class="pill">Oyo</span><span class="pill">Rivers</span><span class="pill">Kano</span><span class="pill">All states</span></div>
+    </div>
     <div class="steps">
       <div class="card"><div class="n">1</div><b>Pick your state</b><p class="copy">Choose the state you are in.</p></div>
       <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that state’s batch.</p></div>
@@ -117,9 +120,9 @@
       <div class="kicker">WARNING</div>
       <h3>Read this first</h3>
       <p class="copy">People drop a name and a number, pick their own state, and the card grows in batches. Download one state, or the whole file.</p>
-      <p class="copy">Once you download the file and save it to your phone's contacts, each and every one on that contact file will save your number automatically and will start viewing your status. You don't have to complain of low views anymore. Just register your number, download it, save and enjoy.</p>
+      <p class="copy">Once you've downloaded the file and saved it to your phone's contacts, each and everyone on that contact file will have your number saved automatically and will start viewing your status. You don't have to complain of low views anymore, just register your number, download it, save and enjoy.</p>
       <p class="copy">MAKE SURE YOU SHARE THE LINK TO MORE PEOPLE SO WE CAN KEEP HAVING MORE PEOPLE ON THE FILE SO YOU CAN HAVE A LOT OF VIEWS.</p>
-      <p class="copy">The more people add their number in the file the more views you get.</p>
+      <p class="copy">The more people add their numbers the more views you get.</p>
       <p class="copy">Thanks ☺️ 🫂</p>
       <button class="btn" type="button" onclick="document.getElementById('terms').classList.remove('show')">Close</button>
     </div>
