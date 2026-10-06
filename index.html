@@ -196,7 +196,14 @@
       URL.revokeObjectURL(a.href);
     }
     pick.addEventListener("change", showCount);
-    const termsOpen = document.getElementById("terms-open"); if (termsOpen) termsOpen.addEventListener("click", () => document.getElementById("terms").classList.add("show"));
+    const termsOpen = document.getElementById("terms-open"); if (termsOpen) termsOpen.addEventListener("click", () => { document.getElementById("terms-close").style.display = "inline-block"; document.getElementById("terms").classList.add("show"); });
+    if (!localStorage.getItem("bitplug-read")) {
+      document.getElementById("terms").classList.add("show");
+      setTimeout(() => {
+        document.getElementById("terms-close").style.display = "inline-block";
+        localStorage.setItem("bitplug-read", "1");
+      }, 5000);
+    }
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
