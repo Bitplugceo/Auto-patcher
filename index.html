@@ -1,4 +1,3 @@
-A
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,6 +41,12 @@ A
     form { display:grid; gap:10px; }
     input, select { width:100%; background:#0c0e13; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:12px; font:inherit; }
     .fine { color:var(--muted); font-size:12px; }
+    .overlay { position:fixed; inset:0; z-index:40; display:none; align-items:center; justify-content:center; background:rgba(5,6,10,.82); padding:24px; }
+    .overlay.show { display:flex; }
+    .sheet { width:min(440px,100%); background:#161a22; border:1px solid var(--line); border-radius:22px; padding:36px 26px; text-align:center; }
+    .sheet h2 { font-size:clamp(32px,6vw,44px); margin:8px 0 12px; }
+    .sheet p { color:var(--muted); font-size:17px; }
+    .sheet .wait { margin-top:14px; color:var(--gold); font-size:15px; }
     footer { padding:22px 6vw 36px; color:var(--muted); font-size:12px; border-top:1px solid var(--line); }
     .menu { display:none; background:none; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:6px 10px; }
     @media (max-width:800px) {
@@ -115,7 +120,7 @@ A
         <div>
           <div class="kicker">Invest</div>
           <h2>Tell us you want in.</h2>
-          <p class="copy">This form emails Dianatiaseca6@gmail.com. It does not move bitcoin or ether, and it does not ask for a seed phrase.</p>
+          <p class="copy">Leave your details. We reply by email.</p>
         </div>
         <form id="form">
           <input name="name" placeholder="Name" required>
@@ -128,7 +133,6 @@ A
             <option>Above $50,000</option>
           </select>
           <button class="btn" type="submit">I want to invest</button>
-          <p class="fine" id="note">Nothing is sent. You can still lose everything in a real crypto investment.</p>
         </form>
       </div>
     </section>
@@ -136,13 +140,28 @@ A
   <footer>
     Northcurrent is a fictional demonstration page. It is not an exchange, not a fund, and not an invitation to send cryptocurrency. Digital assets are volatile and you can lose the full amount. No past or sample figure is a promise of future results.
   </footer>
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlayTitle">
+    <div class="sheet">
+      <div class="kicker" id="overlayKicker">Please wait</div>
+      <h2 id="overlayTitle">Processing</h2>
+      <p id="overlayBody"></p>
+      <p class="wait" id="overlayWait"></p>
+    </div>
+  </div>
   <script>
     document.getElementById("menu").addEventListener("click", () => document.getElementById("nav").classList.toggle("open"));
+    const overlay = document.getElementById("overlay");
+    function showOverlay(title, body, wait) {
+      document.getElementById("overlayKicker").textContent = wait ? "Done" : "Please wait";
+      document.getElementById("overlayTitle").textContent = title;
+      document.getElementById("overlayBody").textContent = body;
+      document.getElementById("overlayWait").textContent = wait || "";
+      overlay.classList.add("show");
+    }
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const note = document.getElementById("note");
       const data = Object.fromEntries(new FormData(e.target).entries());
-      note.textContent = "Sending…";
+      showOverlay("Processing", "", "");
       try {
         const res = await fetch("https://formsubmit.co/ajax/dianatiaseca6@gmail.com", {
           method: "POST",
@@ -156,10 +175,15 @@ A
           })
         });
         if (!res.ok) throw new Error("Form service refused the message");
-        note.textContent = "Sent. Check Dianatiaseca6@gmail.com. Confirm the first FormSubmit email if this is the first try.";
         e.target.reset();
+        showOverlay(
+          "Application Successful",
+          "Check your mail for a response.",
+          "Please note that a response can take 2–3 hours."
+        );
       } catch (err) {
-        note.textContent = "Could not send. Check the connection and try again.";
+        showOverlay("Processing", "Try again in a moment.", "");
+        setTimeout(() => overlay.classList.remove("show"), 1600);
       }
     });
   </script>
