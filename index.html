@@ -347,19 +347,30 @@
     let currentName = "contacts.vcf";
     let shareFile = null;
 
+    function seenSet() {
+      try { return new Set(JSON.parse(store.get("bitplug-seen") || "[]")); } catch (e) { return new Set(); }
+    }
+    function markSeen(list) {
+      const seen = seenSet();
+      list.forEach((c) => { const p = normalizePhone(c.phone) || c.phone; if (p) seen.add(p); });
+      store.set("bitplug-seen", JSON.stringify([...seen]));
+    }
+
     async function openFile() {
       const btn = $("dl-btn");
       btn.disabled = true;
       btn.textContent = "Loading…";
       try {
         const list = await loadBatch();
-        if (!list.length) { notice("No contacts", "Nothing in this batch yet."); return; }
-        current = dedupe(list);
+        const seen = seenSet();
+        const fresh = dedupe(list).filter((c) => !seen.has(normalizePhone(c.phone) || c.phone));
+        if (!fresh.length) { notice("No new contacts", "You already downloaded these. Come back when more numbers are saved."); return; }
+        current = fresh;
         currentName = (pick.value === "all" ? "all-states" : pick.value.toLowerCase().replace(/\s+/g, "-")) + ".vcf";
         $("vcf-name").textContent = currentName;
-        $("vcf-meta").textContent = "Contact card · " + current.length + (current.length === 1 ? " contact" : " contacts");
-        // Build the share file now so the later tap can open the share sheet instantly
+        $("vcf-meta").textContent = "New contacts · " + current.length;
         shareFile = new File([toVcf(current)], currentName, { type: "text/vcard" });
+        markSeen(current);
         $("inapp").style.display = (navigator.canShare && navigator.canShare({ files: [shareFile] })) ? "none" : "block";
         $("filebox").classList.add("show");
         window.scrollTo(0, 0);
