@@ -2,204 +2,146 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Wordwell</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Northcurrent — Digital asset investing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0d1117;
-      --panel: #161b22;
-      --text: #e6edf3;
-      --muted: #8b949e;
-      --accent: #3fb950;
-      --border: #30363d;
-      --chip: #010409;
-    }
+    :root { --bg:#090b10; --card:#12151c; --line:#262b36; --text:#f4f1ea; --muted:#a7adba; --gold:#d7b56a; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 22px 14px 36px;
+    body { font-family: Outfit, sans-serif; background: var(--bg); color: var(--text); }
+    a { color: inherit; text-decoration: none; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:18px 6vw; position:sticky; top:0; background:rgba(9,11,16,.9); backdrop-filter:blur(10px); z-index:5; }
+    .logo { font-family: Fraunces, serif; font-size:22px; }
+    nav { display:flex; gap:18px; color:var(--muted); font-size:14px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; background:var(--gold); color:#1b1408; border:none; border-radius:999px; padding:12px 18px; font-weight:600; cursor:pointer; }
+    .btn.ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
+    .hero { display:grid; grid-template-columns:1.05fr .95fr; gap:28px; padding:42px 6vw 24px; align-items:center; }
+    .kicker { color:var(--gold); letter-spacing:.16em; text-transform:uppercase; font-size:11px; font-weight:600; }
+    h1 { font-family:Fraunces, serif; font-size:clamp(40px,6vw,72px); line-height:.96; font-weight:500; margin:14px 0 16px; }
+    .lede { color:var(--muted); font-size:18px; max-width:520px; font-weight:300; }
+    .actions { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; }
+    .hero-img { height:460px; border-radius:18px; background:#111 center/cover no-repeat; }
+    .warn { margin:18px 6vw 0; border:1px solid #3d3422; background:#16130e; color:#e6d3a8; border-radius:12px; padding:12px 14px; font-size:13px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:28px 6vw; }
+    .stat { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; }
+    .stat b { display:block; font-family:Fraunces, serif; font-size:28px; font-weight:500; }
+    .stat span { color:var(--muted); font-size:13px; }
+    section { padding:28px 6vw 64px; }
+    h2 { font-family:Fraunces, serif; font-size:clamp(32px,4vw,48px); font-weight:500; margin:8px 0 18px; }
+    .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; align-items:center; }
+    .grid img { width:100%; height:340px; object-fit:cover; border-radius:16px; }
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; min-height:180px; }
+    .card small { color:var(--gold); letter-spacing:.12em; text-transform:uppercase; font-size:11px; }
+    .card h3 { font-family:Fraunces, serif; font-size:26px; font-weight:500; margin:10px 0; }
+    .card p, .copy { color:var(--muted); }
+    .invest { display:grid; grid-template-columns:1fr 1fr; gap:18px; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:22px; }
+    form { display:grid; gap:10px; }
+    input, select { width:100%; background:#0c0e13; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:12px; font:inherit; }
+    .fine { color:var(--muted); font-size:12px; }
+    footer { padding:22px 6vw 36px; color:var(--muted); font-size:12px; border-top:1px solid var(--line); }
+    .menu { display:none; background:none; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:6px 10px; }
+    @media (max-width:800px) {
+      nav { display:none; }
+      nav.open { display:flex; flex-direction:column; position:absolute; top:60px; left:0; right:0; background:#090b10; padding:16px 6vw; border-bottom:1px solid var(--line); }
+      .menu { display:block; }
+      .hero, .grid, .cards, .stats, .invest { grid-template-columns:1fr; }
+      .hero-img, .grid img { height:240px; }
     }
-    .wrap { width: 100%; max-width: 680px; margin: 0 auto; }
-    h1 { font-size: 24px; letter-spacing: -0.4px; text-align: center; }
-    h1 span { color: #58a6ff; }
-    p.sub { text-align: center; color: var(--muted); font-size: 13px; margin: 6px 0 16px; }
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    button { border: none; cursor: pointer; font-weight: 700; }
-    button:active { transform: scale(0.98); }
-    .go {
-      width: 100%;
-      background: var(--accent);
-      color: #04210c;
-      border-radius: 8px;
-      padding: 14px 18px;
-      font-size: 16px;
-    }
-    .result-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .result-head span { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
-    .copy {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: var(--chip);
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-size: 18px;
-    }
-    .copy.done { border-color: var(--accent); color: var(--accent); }
-    #out {
-      width: 100%;
-      min-height: 140px;
-      background: var(--chip);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
-      font-size: 18px;
-      line-height: 1.7;
-      resize: vertical;
-      outline: none;
-    }
-    .status { min-height: 20px; margin-top: 8px; font-size: 13px; color: var(--accent); font-weight: 600; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Wordwell <span>Random</span></h1>
-    <p class="sub">12 words. Short, long, then a run of six-letter words.</p>
-    <div class="panel">
-      <button class="go" id="gen" type="button">Generate</button>
-    </div>
-    <div class="panel">
-      <div class="result-head">
-        <span id="label">WORDS</span>
-        <button class="copy" id="copy" type="button" aria-label="Copy words" title="Copy">📋</button>
+  <header>
+    <a class="logo" href="#top">Northcurrent</a>
+    <nav id="nav">
+      <a href="#book">The book</a>
+      <a href="#how">How it works</a>
+      <a href="#invest">Invest</a>
+    </nav>
+    <button class="menu" id="menu" type="button">Menu</button>
+    <a class="btn" href="#invest">Invest</a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <div class="kicker">Digital asset partnership · Demonstration</div>
+        <h1>Put capital into a crypto book you can actually read.</h1>
+        <p class="lede">Northcurrent is a sample page for a bitcoin and ether allocation. If you share this page, visitors land here and are asked to invest — only after they see the risk.</p>
+        <div class="actions">
+          <a class="btn" href="#invest">Invest now</a>
+          <a class="btn ghost" href="#how">See the terms</a>
+        </div>
       </div>
-      <textarea id="out" readonly placeholder="sand animal fun physical panther marble  elegant resource inhale actual turkey engage"></textarea>
-      <div class="status" id="status"></div>
+      <div class="hero-img" style="background-image:url('imagine_images/QsFZJ.jpg')" role="img" aria-label="Gold ring on dark glass"></div>
+    </section>
+    <p class="warn">Crypto prices can fall to zero. This page does not guarantee profit, does not take a deposit, and is not a licensed offer. Do not send coins to anyone because a page asked you to.</p>
+
+    <div class="stats">
+      <div class="stat"><b>BTC · ETH</b><span>Core book. No meme coins.</span></div>
+      <div class="stat"><b>90 days</b><span>Sample notice period, not a lock that hides withdrawals.</span></div>
+      <div class="stat"><b>You keep title</b><span>A real product would name the custodian in writing.</span></div>
     </div>
-  </div>
-<script>
-const SLOTS = [
-  { len: 4, kind: "noun" },
-  { len: 6, kind: "noun" },
-  { len: 3, kind: "any" },
-  { len: 8, kind: "adj" },
-  { len: 7, kind: "noun" },
-  { len: 6, kind: "noun" },
-  { len: 7, kind: "adj" },
-  { len: 8, kind: "noun" },
-  { len: 6, kind: "verb" },
-  { len: 6, kind: "adj" },
-  { len: 6, kind: "noun" },
-  { len: 6, kind: "verb" }
-];
 
-const BANK = {
-  noun: {
-    3: ["bay","bee","elm","fox","ivy","oak","owl","rye","sap"],
-    4: ["sand","rock","wolf","lion","hawk","leaf","pond","pine","moon","star","wind","fire","snow","rain","boat","bird","city","corn","deer","dove","duck","fish","frog","goat","gold","hill","iron","lake","lamp","milk","nest","path","pear","reed","rope","rose","seed","ship","silk","soil","toad","tree","vine","wave","wood","yard","barn","cave","clay","cove","dune","fern","foam","gulf","mist","moss","peak","reef","tide","vale","beam","bolt","cape","colt","fawn","grain","herd","isle","kelp","lark","loom","mare","mink","palm","quay","stem","twig"],
-    6: ["animal","marble","turkey","garden","bridge","candle","meadow","window","mirror","pocket","pencil","market","bottle","shadow","orchid","island","rabbit","pebble","canyon","willow","spruce","timber","forest","flower","stream","valley","silver","copper","bronze","harbor","castle","temple","basket","button","circle","cotton","desert","dragon","engine","fabric","falcon","farmer","gravel","hammer","helmet","insect","jungle","kettle","kitten","lizard","magnet","mammal","mantle","meteor","monkey","muscle","needle","orange","oyster","palace","pepper","pigeon","planet","ribbon","salmon","sandal","shield","singer","spider","sponge","spring","square","statue","string","summer","throat","ticket","tissue","tomato","tongue","tunnel","turtle","vessel","violet","walnut","winter"],
-    7: ["panther","harvest","balance","capital","chamber","climate","compass","crystal","diamond","dolphin","emerald","emperor","fortune","gallery","granite","hamster","harmony","horizon","jaguar","journey","lantern","leather","liberty","majesty","mineral","monarch","mystery","orchard","ostrich","peacock","penguin","phoenix","pioneer","prairie","pumpkin","pyramid","rainbow","reserve","sapphire","scholar","silence","sparrow","spinach","stadium","station","thunder","volcano","warrior","whisper","buffalo","cheetah","coconut","gazelle","giraffe","glacier","harbour","leopard","mammoth","meadows","nectar","pasture","penguin","trumpet"],
-    8: ["resource","mountain","calendar","champion","chemical","crescent","elephant","festival","fortress","fountain","fracture","heritage","hospital","hurricane","industry","language","material","memorial","notebook","paradise","railroad","sandwich","skeleton","standard","strategy","strength","sunshine","surprise","symphony","treasure","tropical","twilight","umbrella","universe","wildlife","woodland","bachelor","campfire","cathedral","chestnut","daylight","dynamite","earthwax","gemstone","goldfish","iceberg","lavender","marble","necklace","painting","pavement","penguin","reindeer","seashell","snowball","starling","sunlight","tortoise","treasure","volcano"]
-  },
-  adj: {
-    3: ["fun","odd","raw","shy","dry","hot","icy","new","old","red","sad","sly"],
-    4: ["hard","bold","calm","cold","dark","fair","fine","firm","glad","kind","mild","neat","pale","rare","safe","soft","tall","wild","wise"],
-    6: ["actual","bright","clever","gentle","golden","hidden","little","modern","narrow","quiet","simple","smooth","strong","tender","common","famous","honest","humble","lively","lonely","mighty","polite","proper","random","remote","silent","stable","steady","strict","subtle","superb","urgent","active","bitter","breezy","cheerful","cosmic","dainty","formal","frozen","gentle","global","honest","joyful","kindly","lovely","mellow","modest","noble","plucky","pretty","rugged","scenic","serene","sharp","sleepy","solemn","sunny","swift"],
-    7: ["elegant","ancient","careful","certain","complex","distant","endless","ethical","extreme","fertile","fragile","generic","graceful","harmless","helpful","hopeful","intense","logical","massive","natural","obvious","patient","perfect","plastic","precise","private","radical","serious","sincere","slender","special","strange","supreme","tactile","visible","wealthy"],
-    8: ["physical","absolute","abstract","abundant","accurate","adjacent","advanced","artistic","athletic","balanced","blatant","cheerful","chemical","colorful","complete","concrete","constant","creative","critical","delicate","distinct","dramatic","electric","enormous","faithful","flexible","generous","glorious","gorgeous","graceful","grateful","handsome","harmless","heavenly","honestly","humble","infinite","intimate","magnetic","majestic","ordinary","peaceful","pleasant","powerful","precious","rational","reliable","sensible","serious","splendid","stubborn","superior","tropical","ultimate","valuable","vertical","vigorous","wireless"]
-  },
-  verb: {
-    3: ["run","see","try","win","ask","dig","fly","mix","owe","pay","sew","sit"],
-    4: ["bake","bend","call","cook","draw","earn","fall","find","grow","hold","jump","keep","lift","make","open","pull","read","ride","save","seek","send","stay","swim","take","walk","wash","wish"],
-    6: ["inhale","engage","accept","admire","arrive","attack","borrow","bounce","browse","change","choose","climb","create","decide","defend","design","expect","follow","gather","happen","invite","listen","manage","notice","obtain","prefer","remain","remove","repair","return","search","select","settle","travel","wonder","absorb","adjust","affirm","answer","appear","assist","attach","attain","attend","avoid","become","behave","belong","betray","bright","cancel","capture","carry","collect","commit","compare","compel","compile","comply","confer","confirm","connect","consist","contain","convey","create","debate","decide","defeat","defend","define","demand","depart","depend","derive","design","desire","detect","devote","direct","divide","donate","emerge","employ","enable","endure","enrich","enter","escape","exceed","expand","expect","expend","export","extend","fasten","finish","follow","forbid","forget","forgive","format","gather","govern","handle","happen","harden","hasten","ignite","imply","impose","improve","include","inform","inject","injure","insert","insist","intend","invent","invite","locate","manage","notice","obtain","occupy","oppose","orbit","pardon","permit","ponder","praise","prefer","prepare","prevent","proceed","produce","protect","provide","punish","pursue","reduce","refine","refuse","regard","reject","relate","relax","remain","remind","remove","render","repair","repeat","report","rescue","resist","resolve","restore","retain","retire","return","reveal","review","revise","reward","sample","search","secure","select","settle","soften","spring","strike","submit","suffer","supply","survey","switch","travel","tremble","unlock","update","vanish","wander","wonder"],
-    7: ["achieve","advance","analyze","arrange","balance","believe","capture","collect","combine","command","compare","compose","conduct","confirm","connect","consist","contain","convert","declare","deliver","develop","discuss","display","examine","execute","explore","express","improve","include","inspect","install","observe","operate","perform","prepare","present","prevent","produce","protect","provide","publish","receive","recover","release","replace","require","resolve","respond","restore","support","suppose","survive"],
-    8: ["absolute","approach","assemble","collapse","complete","consider","continue","decrease","describe","discover","displace","evaluate","generate","identify","increase","indicate","instruct","maintain","organize","persuade","practice","preserve","progress","propose","purchase","register","remember","represent","research","separate","simplify","surround","transfer","treasure","validate"]
-  },
-  any: {
-    3: ["fun","sun","sea","oak","elm","fox","owl","bee","bay","mud","ice","sky","air","ash","ivy","rye","sap","dew","fog","log","map","nut","ore","rim","wax","odd","raw","shy","dry","hot","new","old","red","run","see","try","win","ask","dig","fly"]
-  }
-};
+    <section id="book">
+      <div class="grid">
+        <img src="imagine_images/im0dq.jpg" alt="Dark metal mesh with a line of warm light">
+        <div>
+          <div class="kicker">The book</div>
+          <h2>Two assets. One rule.</h2>
+          <p class="copy">The sample allocation is bitcoin and ether only. No promised daily rate. No “deposit and watch a balance climb.” If a page shows profit before you can withdraw, leave it.</p>
+        </div>
+      </div>
+    </section>
 
-function unique(list) {
-  return [...new Set(list)];
-}
-for (const kind of Object.keys(BANK)) {
-  for (const len of Object.keys(BANK[kind])) BANK[kind][len] = unique(BANK[kind][len]);
-}
+    <section>
+      <div class="cards">
+        <article class="card"><small>01</small><h3>Read</h3><p>Who holds the coins, what the fee is, and how you exit. If those three are missing, it is not an investment. It is a request for money.</p></article>
+        <article class="card"><small>02</small><h3>Decide</h3><p>Only money you can lose. A falling market is the normal case, not a surprise.</p></article>
+        <article class="card"><small>03</small><h3>Invest</h3><p>On a real site, the button would open the custodian’s own page. This button only records interest on this screen.</p></article>
+      </div>
+    </section>
 
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    <section id="how">
+      <h2>What this link does.</h2>
+      <p class="copy">A link only works after you host this file. Opening the file on your phone does not give other people a page. Put it on Netlify, GitHub Pages, or your own domain, then send that address. Visitors arrive on this page and the Invest button brings them to the form.</p>
+    </section>
 
-let lastKey = "";
-
-function wordsFor(slot) {
-  const bag = BANK[slot.kind] && BANK[slot.kind][slot.len];
-  if (bag && bag.length) return bag;
-  return BANK.any[slot.len] || BANK.noun[slot.len] || [];
-}
-
-function generate() {
-  let out = [];
-  for (let attempt = 0; attempt < 50; attempt++) {
-    const used = new Set();
-    out = [];
-    let ok = true;
-    for (const slot of SLOTS) {
-      const choices = wordsFor(slot).filter(w => !used.has(w) && w.length === slot.len);
-      if (!choices.length) { ok = false; break; }
-      const w = pick(choices);
-      used.add(w);
-      out.push(w);
-    }
-    const key = out.join("\0");
-    if (ok && out.length === 12 && key !== lastKey) break;
-  }
-  lastKey = out.join("\0");
-  const line = out.slice(0, 6).join(" ") + "  " + out.slice(6).join(" ");
-  document.getElementById("out").value = line;
-  document.getElementById("label").textContent = "12 WORDS";
-  document.getElementById("status").textContent = "New set. A word may return later, the line will not.";
-  document.getElementById("copy").classList.remove("done");
-}
-
-async function copyWords() {
-  const text = document.getElementById("out").value.trim();
-  const status = document.getElementById("status");
-  if (!text) {
-    status.textContent = "Generate first.";
-    return;
-  }
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
-    else {
-      const box = document.getElementById("out");
-      box.focus();
-      box.select();
-      document.execCommand("copy");
-    }
-    document.getElementById("copy").classList.add("done");
-    status.textContent = "Copied.";
-  } catch (err) {
-    status.textContent = "Copy failed. Select the words and copy manually.";
-  }
-}
-
-document.getElementById("gen").addEventListener("click", generate);
-document.getElementById("copy").addEventListener("click", copyWords);
-</script>
+    <section id="invest">
+      <div class="invest">
+        <div>
+          <div class="kicker">Invest</div>
+          <h2>Tell us you want in.</h2>
+          <p class="copy">This form does not move bitcoin or ether. It does not ask for a seed phrase. A live firm would follow with identity checks and a custodian, not a wallet address pasted in a chat.</p>
+        </div>
+        <form id="form">
+          <input name="name" placeholder="Name" required>
+          <input name="email" type="email" placeholder="Email" required>
+          <select name="size" aria-label="Amount you are considering">
+            <option>Amount you are considering</option>
+            <option>Under $1,000</option>
+            <option>$1,000 – $10,000</option>
+            <option>$10,000 – $50,000</option>
+            <option>Above $50,000</option>
+          </select>
+          <button class="btn" type="submit">I want to invest</button>
+          <p class="fine" id="note">Nothing is sent. You can still lose everything in a real crypto investment.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <footer>
+    Northcurrent is a fictional demonstration page. It is not an exchange, not a fund, and not an invitation to send cryptocurrency. Digital assets are volatile and you can lose the full amount. No past or sample figure is a promise of future results.
+  </footer>
+  <script>
+    document.getElementById("menu").addEventListener("click", () => document.getElementById("nav").classList.toggle("open"));
+    document.getElementById("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      document.getElementById("note").textContent = "Interest noted on this page only. No coins were requested or received.";
+      e.target.reset();
+    });
+  </script>
 </body>
 </html>
