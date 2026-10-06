@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Northcurrent desk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#090b10; --line:#262b36; --text:#f4f1ea; --muted:#a7adba; --gold:#d7b56a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Outfit, sans-serif; background: var(--bg); color: var(--text); }
+    header { display:flex; justify-content:space-between; align-items:center; padding:16px 18px; border-bottom:1px solid var(--line); }
+    .logo { font-family: Fraunces, serif; font-size:22px; }
+    .layout { display:grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+    aside { border-right:1px solid var(--line); }
+    button, input { font: inherit; }
+    .person { width:100%; text-align:left; background:none; color:var(--text); border:none; border-bottom:1px solid var(--line); padding:14px; cursor:pointer; }
+    .person.on { background:#161a22; }
+    .thread { padding:18px 18px 110px; display:flex; flex-direction:column; gap:10px; }
+    .bubble { max-width:80%; padding:12px 14px; border-radius:16px; background:#1c212b; }
+    .bubble.desk { margin-left:auto; background:#3c321c; color:#f6edd8; }
+    .bubble small { display:block; color:var(--muted); font-size:11px; margin-bottom:4px; }
+    .composer { position:fixed; left:220px; right:0; bottom:0; display:flex; gap:8px; padding:12px; background:#090b10; border-top:1px solid var(--line); }
+    input { flex:1; background:#0c0e13; color:var(--text); border:1px solid var(--line); border-radius:10px; padding:12px; }
+    .send { background:var(--gold); color:#1b1408; border:none; border-radius:999px; padding:12px 16px; font-weight:600; }
+    .empty { color:var(--muted); padding:24px; }
+    @media (max-width:700px) { .layout { grid-template-columns:1fr; } .composer { left:0; } aside { max-height:180px; overflow:auto; } }
+  </style>
+</head>
+<body>
+  <header><span class="logo">Desk</span><span id="status">Waiting for database keys</span></header>
+  <div class="layout">
+    <aside id="list"></aside>
+    <div>
+      <div class="thread" id="thread"><p class="empty">Pick a person. Your reply shows in their inbox.</p></div>
+      <form class="composer" id="form">
+        <input id="input" placeholder="Reply" required>
+        <button class="send" type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const NC = { url: "", key: "" };
+    const db = (NC.url && NC.key && window.supabase) ? window.supabase.createClient(NC.url, NC.key) : null;
+    let current = "";
+    const list = document.getElementById("list");
+    const thread = document.getElementById("thread");
+    function bubble(row) {
+      const el = document.createElement("div");
+      el.className = "bubble" + (row.sender === "desk" ? " desk" : "");
+      const who = document.createElement("small");
+      who.textContent = row.sender === "desk" ? "You" : row.thread_email;
+      el.appendChild(who);
+      el.appendChild(document.createTextNode(row.body));
+      return el;
+    }
+    async function loadList() {
+      if (!db) return;
+      const { data } = await db.from("messages").select("thread_email,body,created_at").order("created_at", { ascending: false });
+      const seen = new Set();
+      list.innerHTML = "";
+      (data || []).forEach((row) => {
+        if (seen.has(row.thread_email)) return;
+        seen.add(row.thread_email);
+        const btn = document.createElement("button");
+        btn.className = "person" + (row.thread_email === current ? " on" : "");
+        btn.type = "button";
+        btn.textContent = row.thread_email;
+        btn.addEventListener("click", () => openThread(row.thread_email));
+        list.appendChild(btn);
+      });
+    }
+    async function openThread(email) {
+      current = email;
+      const { data } = await db.from("messages").select("*").eq("thread_email", email).order("created_at");
+      thread.innerHTML = "";
+      (data || []).forEach((row) => thread.appendChild(bubble(row)));
+      thread.scrollTop = thread.scrollHeight;
+      loadList();
+    }
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!db || !current) return;
+      const body = document.getElementById("input").value.trim();
+      if (!body) return;
+      await db.from("messages").insert({ thread_email: current, sender: "desk", body });
+      e.target.reset();
+      openThread(current);
+    });
+    if (db) {
+      document.getElementById("status").textContent = "Live";
+      loadList();
+      setInterval(loadList, 4000);
+    }
+  </script>
+</body>
+</html>
