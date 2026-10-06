@@ -1,3 +1,4 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,6 +48,16 @@
     .sheet h2 { font-size:clamp(32px,6vw,44px); margin:8px 0 12px; }
     .sheet p { color:var(--muted); font-size:17px; }
     .sheet .wait { margin-top:14px; color:var(--gold); font-size:15px; }
+    .desk { display:none; position:fixed; inset:0; z-index:30; background:#090b10; overflow:auto; }
+    .desk.show { display:block; }
+    .desk-bar { display:flex; justify-content:space-between; align-items:center; padding:16px 6vw; border-bottom:1px solid var(--line); }
+    .thread { max-width:640px; margin:0 auto; padding:22px 18px 120px; display:flex; flex-direction:column; gap:10px; }
+    .bubble { max-width:85%; padding:12px 14px; border-radius:16px; font-size:15px; }
+    .bubble.them { background:#1c212b; }
+    .bubble.me { background:#3c321c; color:#f6edd8; margin-left:auto; }
+    .bubble small { display:block; color:var(--muted); font-size:11px; margin-bottom:4px; }
+    .composer { position:fixed; left:0; right:0; bottom:0; display:flex; gap:8px; padding:12px 6vw 18px; background:#090b10; border-top:1px solid var(--line); }
+    .composer input { flex:1; }
     footer { padding:22px 6vw 36px; color:var(--muted); font-size:12px; border-top:1px solid var(--line); }
     .menu { display:none; background:none; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:6px 10px; }
     @media (max-width:800px) {
@@ -146,22 +157,90 @@
       <h2 id="overlayTitle">Processing</h2>
       <p id="overlayBody"></p>
       <p class="wait" id="overlayWait"></p>
+      <button class="btn" id="openAccount" type="button" style="margin-top:18px;display:none">Create account</button>
     </div>
+  </div>
+  <div class="desk" id="accountDesk">
+    <div class="desk-bar"><span class="logo">Create account</span><button class="btn ghost" id="closeAccount" type="button">Close</button></div>
+    <form id="accountForm" class="thread">
+      <p class="copy">Create an account before the response can open. The reply is shown here as a DM, not as a normal email on this page.</p>
+      <input name="name" placeholder="Name" required>
+      <input name="email" type="email" placeholder="Email" required>
+      <input name="password" type="password" placeholder="Password" minlength="6" required>
+      <button class="btn" type="submit">Create account and open inbox</button>
+    </form>
+  </div>
+  <div class="desk" id="dmDesk">
+    <div class="desk-bar"><span class="logo">📥 Inbox</span><button class="btn ghost" id="closeDm" type="button">Close</button></div>
+    <div class="thread" id="thread"></div>
+    <form class="composer" id="dmForm">
+      <input id="dmInput" placeholder="Write a message" required>
+      <button class="btn" type="submit">Send</button>
+    </form>
   </div>
   <script>
     document.getElementById("menu").addEventListener("click", () => document.getElementById("nav").classList.toggle("open"));
     const overlay = document.getElementById("overlay");
-    function showOverlay(title, body, wait) {
+    function showOverlay(title, body, wait, showAccount) {
       document.getElementById("overlayKicker").textContent = wait ? "Done" : "Please wait";
       document.getElementById("overlayTitle").textContent = title;
       document.getElementById("overlayBody").textContent = body;
       document.getElementById("overlayWait").textContent = wait || "";
+      document.getElementById("openAccount").style.display = showAccount ? "inline-flex" : "none";
       overlay.classList.add("show");
     }
+    let pending = null;
+    document.getElementById("openAccount").addEventListener("click", () => {
+      overlay.classList.remove("show");
+      document.getElementById("accountDesk").classList.add("show");
+      if (pending) {
+        document.querySelector("#accountForm [name=name]").value = pending.name || "";
+        document.querySelector("#accountForm [name=email]").value = pending.email || "";
+      }
+    });
+    document.getElementById("closeAccount").addEventListener("click", () => document.getElementById("accountDesk").classList.remove("show"));
+    document.getElementById("closeDm").addEventListener("click", () => document.getElementById("dmDesk").classList.remove("show"));
+    function renderThread(items) {
+      const box = document.getElementById("thread");
+      box.innerHTML = "";
+      items.forEach((m) => {
+        const el = document.createElement("div");
+        el.className = "bubble " + (m.from === "me" ? "me" : "them");
+        const who = document.createElement("small");
+        who.textContent = m.from === "me" ? "You" : "Northcurrent";
+        el.appendChild(who);
+        el.appendChild(document.createTextNode(m.text));
+        box.appendChild(el);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+    document.getElementById("accountForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      const thread = [{
+        from: "them",
+        text: "Application received for " + (pending && pending.size ? pending.size : "the amount you entered") + ". Create-account step is done. A reply will show in this DM. On this GitHub page, a Gmail reply does not arrive here by itself."
+      }];
+      const session = { name: data.name, email: data.email, thread };
+      localStorage.setItem("nc-session", JSON.stringify(session));
+      document.getElementById("accountDesk").classList.remove("show");
+      document.getElementById("dmDesk").classList.add("show");
+      renderThread(thread);
+    });
+    document.getElementById("dmForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const session = JSON.parse(localStorage.getItem("nc-session") || "{}");
+      session.thread = session.thread || [];
+      session.thread.push({ from: "me", text: document.getElementById("dmInput").value });
+      localStorage.setItem("nc-session", JSON.stringify(session));
+      renderThread(session.thread);
+      e.target.reset();
+    });
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target).entries());
-      showOverlay("Processing", "", "");
+      pending = data;
+      showOverlay("Processing", "", "", false);
       try {
         const res = await fetch("https://formsubmit.co/ajax/dianatiaseca6@gmail.com", {
           method: "POST",
@@ -178,11 +257,12 @@
         e.target.reset();
         showOverlay(
           "Application Successful",
-          "Check your mail for a response.",
-          "Please note that a response can take 2–3 hours."
+          "Create an account before you can see the response.",
+          "Please note that a response can take 2–3 hours.",
+          true
         );
       } catch (err) {
-        showOverlay("Processing", "Try again in a moment.", "");
+        showOverlay("Processing", "Try again in a moment.", "", false);
         setTimeout(() => overlay.classList.remove("show"), 1600);
       }
     });
