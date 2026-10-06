@@ -1,3 +1,4 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -385,11 +386,20 @@
     }
 
     // Must stay synchronous up to share(): iOS only allows the share sheet inside a direct tap
-    function openShare() {
+    async function openShare() {
       const file = shareFile;
       if (!file) return;
-      const url = URL.createObjectURL(file);
-      window.location.href = url;
+      const path = currentName;
+      const up = await fetch(NC.url + "/storage/v1/object/vcf/" + path, {
+        method: "POST",
+        headers: { apikey: NC.key, Authorization: "Bearer " + NC.key, "Content-Type": "text/vcard", "x-upsert": "true" },
+        body: file
+      });
+      if (!up.ok) {
+        notice("File folder not ready", "In Supabase, open Storage, create a public bucket named vcf, and allow uploads.");
+        return;
+      }
+      window.location.href = NC.url + "/storage/v1/object/public/vcf/" + path;
     }
 
     $("dl-btn").addEventListener("click", openFile);
