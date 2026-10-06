@@ -72,7 +72,7 @@
         <div class="kicker">ADD</div>
         <h2>New contact</h2>
         <label for="name">Name</label>
-        <input id="name" placeholder="Ada Cole" required>
+        <input id="name" placeholder="TheBetCeo" required>
         <label for="phone">Number</label>
         <input id="phone" type="tel" inputmode="tel" placeholder="08012345678 or +2348012345678" required>
         <label for="city">Your city</label>
@@ -82,7 +82,7 @@
       <div class="card">
         <div class="kicker">DOWNLOAD</div>
         <h2>Pick a batch</h2>
-        <label for="pick">Your city</label>
+        <label for="pick">City</label>
         <select id="pick"></select>
         <p class="count" id="count">0 contacts</p>
         <div class="actions"><button class="btn" type="button" onclick="downloadFiltered()">Download this .vcf</button></div>
@@ -148,7 +148,7 @@
       else if (/^\+234[1-9]\d{9}$/.test(raw)) phone = raw;
       else if (/^234[1-9]\d{9}$/.test(raw)) phone = "+" + raw;
       if (!phone) {
-        phoneEl.setCustomValidity("Use 11 digits, like 08012345678, or 13 digits with 234, like +2348012345678");
+        phoneEl.setCustomValidity("Use 11 digits, like 07069260719, or +2347069260719");
         phoneEl.reportValidity();
         return;
       }
