@@ -34,7 +34,7 @@
     .card { background:#fff; border:1px solid var(--line); border-radius:20px; padding:18px; }
     .stack { display:grid; gap:14px; max-width:640px; }
     .n { width:32px; height:32px; border-radius:50%; background:#e7f8ee; color:var(--deep); display:grid; place-items:center; font-weight:800; margin-bottom:10px; }
-    .batches { grid-template-columns:repeat(3,1fr); }
+    .batches { display:grid; gap:14px; grid-template-columns:1fr; }
     .batch { cursor:pointer; }
     .batch .copy { margin:8px 0 0; font-size:14px; }
     .bar { height:8px; background:#edf2f0; border-radius:99px; margin:12px 0 0; overflow:hidden; }
@@ -75,7 +75,7 @@
     .viewer.show { display:flex; }
     .viewer .frame { position:relative; max-width:100%; max-height:92vh; margin:auto; }
     .viewer img { max-width:100%; max-height:92vh; width:auto; height:auto; object-fit:contain; border-radius:12px; display:block; }
-    .hint { position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:2; margin:0; background:rgba(0,0,0,.78); color:#fff; font-size:13px; border-radius:999px; padding:8px 12px; white-space:nowrap; }
+    .hint { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2; margin:0; background:rgba(0,0,0,.78); color:#fff; font-size:13px; border-radius:999px; padding:8px 12px; white-space:nowrap; }
     @media (max-width:800px) { .steps { grid-template-columns:1fr; } .shots { grid-template-columns:repeat(2,1fr); } }
   </style>
 </head>
@@ -204,7 +204,7 @@
     const NC = { url: "https://frvajexelqybambebyno.supabase.co", key: "sb_publishable_C4r6K4LxXccnppbVvYuqpA_AVmwl6vj" };
     const OWNER = "+2347069260719";
     const BATCH = 50;
-    const featured = ["Lagos", "Oyo", "Rivers", "Kano", "FCT"];
+    const featured = ["Lagos", "Oyo", "FCT"];
     const states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara","FCT"];
 
     const $ = (id) => document.getElementById(id);
