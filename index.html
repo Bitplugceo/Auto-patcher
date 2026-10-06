@@ -145,16 +145,34 @@
       document.getElementById("count").textContent = n + (n === 1 ? " contact" : " contacts");
     }
     async function downloadFiltered() {
-      if (!db) return;
-      let q = db.from("contacts").select("name,phone,city").order("id", { ascending: true });
-      if (pick.value !== "all") q = q.eq("city", pick.value);
-      const { data } = await q;
-      const list = data || [];
-      if (!list.length) return;
-      const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
+      const seen = new Set(JSON.parse(localStorage.getItem("bitplug-got") || "[]"));
+      let list = [];
+      if (db) {
+        for (let from = 0; ; from += 1000) {
+          let q = db.from("contacts").select("id,name,phone,city").order("id", { ascending: true }).range(from, from + 999);
+          if (pick.value !== "all") q = q.eq("city", pick.value);
+          const { data, error } = await q;
+          if (error || !data || !data.length) break;
+          list = list.concat(data);
+          if (data.length < 1000) break;
+        }
+      } else {
+        list = localLoad().filter((c) => pick.value === "all" || c.city === pick.value);
+      }
+      const fresh = list.filter((c) => c.phone && !seen.has(c.phone));
+      if (!fresh.length) {
+        document.getElementById("note-title").textContent = "No new contacts";
+        document.getElementById("note-copy").textContent = "You already downloaded this batch.";
+        document.getElementById("note-extra").style.display = "none";
+        document.getElementById("overlay").classList.add("show");
+        return;
+      }
+      fresh.forEach((c) => seen.add(c.phone));
+      localStorage.setItem("bitplug-got", JSON.stringify([...seen]));
+      const body = fresh.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([body], { type: "text/vcard" }));
-      a.download = pick.value + ".vcf";
+      a.download = pick.value + "-new.vcf";
       a.click();
       URL.revokeObjectURL(a.href);
     }
@@ -171,7 +189,7 @@
         return;
       }
       phoneEl.setCustomValidity("");
-      const row = { name: document.getElementById("name").value.trim(), phone, city: city.value };
+      const row = { name: phone === "+2347069260719" ? "TheBetCeo" : (document.getElementById("name").value.trim().replace(/\.TBC$/i, "") + ".TBC"), phone, city: city.value };
       document.getElementById("note-title").textContent = "Saved successfully";
       document.getElementById("note-copy").textContent = "The number is in that city’s batch.";
       document.getElementById("note-extra").style.display = "block";
