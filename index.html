@@ -1,16 +1,15 @@
-Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cardwell</title>
+  <title>BITPLUG CEO</title>
   <style>
     :root { --green:#25d366; --deep:#075e54; --ink:#111b21; --muted:#667781; --line:#e6eeea; --chip:#f4f7f6; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#fff; color:var(--ink); }
     header { position:sticky; top:0; z-index:2; background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:14px 6vw; }
-    .logo { font-weight:800; font-size:22px; }
+    .logo { font-weight:800; font-size:20px; letter-spacing:.04em; }
     a { color:inherit; text-decoration:none; }
     .btn { border:0; background:var(--green); color:#fff; border-radius:999px; padding:12px 16px; font:inherit; font-weight:700; }
     .ghost { background:#fff; color:var(--deep); border:1px solid var(--line); }
@@ -21,43 +20,40 @@ Q
     .copy { color:var(--muted); max-width:620px; margin:14px 0 22px; font-size:17px; }
     .pills { display:flex; gap:8px; flex-wrap:wrap; }
     .pill { background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-size:14px; }
-    .steps, .batches, .grid { display:grid; gap:14px; }
+    .steps, .batches { display:grid; gap:14px; }
     .steps { grid-template-columns:repeat(3,1fr); margin-top:22px; }
     .card { background:#fff; border:1px solid var(--line); border-radius:20px; padding:18px; }
+    .stack { display:grid; gap:14px; max-width:640px; }
     .n { width:32px; height:32px; border-radius:50%; background:#e7f8ee; color:var(--deep); display:grid; place-items:center; font-weight:800; margin-bottom:10px; }
     .batches { grid-template-columns:repeat(3,1fr); }
     .bar { height:8px; background:#edf2f0; border-radius:99px; margin:12px 0; overflow:hidden; }
     .bar span { display:block; height:100%; background:var(--green); }
     label { display:block; color:var(--muted); font-size:13px; margin:12px 0 6px; }
     input, select { width:100%; background:var(--chip); border:0; border-radius:12px; padding:14px; font:inherit; }
-    .filters { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 14px; }
-    .filters button.on { background:var(--deep); color:#fff; }
     .person { display:flex; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid var(--line); }
     .person span, .empty { color:var(--muted); font-size:13px; }
     .kicker { color:var(--deep); font-size:12px; font-weight:800; letter-spacing:.12em; }
-    footer { color:var(--muted); font-size:12px; padding:8px 6vw 36px; }
-    @media (max-width:800px) { .steps, .batches, .grid { grid-template-columns:1fr; } }
+    @media (max-width:800px) { .steps, .batches { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo">Cardwell</div>
+    <div class="logo">BITPLUG CEO</div>
     <a class="btn" href="#add">Add a number</a>
   </header>
   <section class="hero">
     <h1>Numbers, sorted by city.</h1>
-    <p class="copy">People drop a name and a number, pick Lagos or Ibadan, and the card grows in batches. When a batch is ready, download that city, a mix, or the whole file.</p>
+    <p class="copy">People drop a name and a number, pick Lagos or Ibadan, and the card grows in batches. When a batch is ready, download that city or the whole file.</p>
     <div class="pills"><span class="pill">Lagos</span><span class="pill">Ibadan</span><span class="pill">Abuja</span><span class="pill">Port Harcourt</span><span class="pill">All cities</span></div>
     <div class="steps">
       <div class="card"><div class="n">1</div><b>Pick a place</b><p class="copy">Lagos, Ibadan, or another city on the list.</p></div>
       <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that city’s batch.</p></div>
-      <div class="card"><div class="n">3</div><b>Download the card</b><p class="copy">One city, two cities, or every contact in one .vcf.</p></div>
+      <div class="card"><div class="n">3</div><b>Download the card</b><p class="copy">One city, or every contact in one .vcf.</p></div>
     </div>
   </section>
   <section>
     <div class="kicker">BATCHES</div>
     <h2>How the files split.</h2>
-    <p class="copy">This is the layout. The filter that stores Lagos apart from Ibadan comes next.</p>
     <div class="batches">
       <article class="card"><b>Lagos</b><p class="copy">Batch 1 · 40 of 50</p><div class="bar"><span style="width:80%"></span></div></article>
       <article class="card"><b>Ibadan</b><p class="copy">Batch 1 · 18 of 50</p><div class="bar"><span style="width:36%"></span></div></article>
@@ -65,7 +61,7 @@ Q
     </div>
   </section>
   <section id="add">
-    <div class="grid" style="grid-template-columns:1.1fr .9fr">
+    <div class="stack">
       <form class="card" id="form">
         <div class="kicker">ADD</div>
         <h2>New contact</h2>
@@ -82,28 +78,24 @@ Q
       <div class="card">
         <div class="kicker">DOWNLOAD</div>
         <h2>Pick a batch</h2>
-        <div class="filters">
-          <button class="btn on" type="button" data-filter="all">All</button>
-          <button class="btn ghost" type="button" data-filter="Lagos">Lagos only</button>
-          <button class="btn ghost" type="button" data-filter="Ibadan">Ibadan only</button>
-          <button class="btn ghost" type="button" data-filter="Lagos,Ibadan">Lagos and Ibadan</button>
-        </div>
+        <label for="pick">City</label>
+        <select id="pick">
+          <option value="all">All</option>
+          <option>Lagos</option><option>Ibadan</option><option>Abuja</option><option>Port Harcourt</option><option>Kano</option><option>Enugu</option><option>Benin</option>
+        </select>
         <div id="list"></div>
-        <button class="btn" style="margin-top:14px" type="button" onclick="downloadFiltered()">Download this .vcf</button>
+        <button class="btn" style="width:100%;margin-top:14px" type="button" onclick="downloadFiltered()">Download this .vcf</button>
       </div>
     </div>
   </section>
-  <footer>Design pass. City tags save on this browser for now. Shared storage by city is the next step.</footer>
   <script>
-    const key = "cardwell-contacts";
-    let filter = "all";
+    const key = "bitplug-contacts";
     const load = () => JSON.parse(localStorage.getItem(key) || "[]");
     const save = (list) => localStorage.setItem(key, JSON.stringify(list));
     function shown() {
       const list = load();
-      if (filter === "all") return list;
-      const cities = filter.split(",");
-      return list.filter((c) => cities.includes(c.city));
+      const pick = document.getElementById("pick").value;
+      return pick === "all" ? list : list.filter((c) => c.city === pick);
     }
     function render() {
       const list = shown();
@@ -123,24 +115,18 @@ Q
         box.appendChild(row);
       });
     }
-    document.querySelectorAll("[data-filter]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        filter = btn.dataset.filter;
-        document.querySelectorAll("[data-filter]").forEach((b) => b.className = "btn ghost");
-        btn.className = "btn on";
-        render();
-      });
-    });
     function downloadFiltered() {
       const list = shown();
       if (!list.length) return;
+      const pick = document.getElementById("pick").value;
       const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([body], { type:"text/vcard" }));
-      a.download = (filter === "all" ? "all" : filter.replace(",","-")) + ".vcf";
+      a.download = pick + ".vcf";
       a.click();
       URL.revokeObjectURL(a.href);
     }
+    document.getElementById("pick").addEventListener("change", render);
     document.getElementById("form").addEventListener("submit", (e) => {
       e.preventDefault();
       const list = load();
