@@ -1,3 +1,4 @@
+Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -211,16 +212,14 @@
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
-      let digits = phoneEl.value.replace(/\D/g, "");
-      if (digits.startsWith("234") && digits.length === 13) digits = digits.slice(3);
-      if (digits.startsWith("0") && digits.length === 11) digits = digits.slice(1);
-      const phone = /^\d{10}$/.test(digits) ? "+234" + digits : "";
+      phoneEl.setCustomValidity("");
+      const digits = phoneEl.value.replace(/\D/g, "");
+      const phone = digits.startsWith("234") && digits.length === 13 ? "+" + digits : "";
       if (!phone) {
-        phoneEl.setCustomValidity("Use +2347069260719, 07069260719, or 7069260719");
+        phoneEl.setCustomValidity("Use the full format, like +2347069260719");
         phoneEl.reportValidity();
         return;
       }
-      phoneEl.setCustomValidity("");
       const row = { name: phone === "+2347069260719" ? "TheBetCeo" : (document.getElementById("name").value.trim().replace(/\.TBC$/i, "") + ".TBC"), phone, city: city.value };
       document.getElementById("note-title").textContent = "Saved successfully";
       document.getElementById("note-copy").textContent = "The number is in that city’s batch.";
@@ -228,7 +227,8 @@
       document.getElementById("overlay").classList.add("show");
       e.target.reset();
       if (db) {
-        const { data: existing } = await db.from("contacts").select("id").eq("phone", phone).limit(1);
+        const same = [phone, "0" + phone.slice(4), phone.slice(4)];
+        const { data: existing } = await db.from("contacts").select("id").in("phone", same).limit(1);
         if (existing && existing.length) {
           document.getElementById("note-title").textContent = "Contact already saved";
           document.getElementById("note-copy").textContent = "This number is already in the file.";
@@ -238,7 +238,7 @@
         await db.from("contacts").insert(row);
       } else {
         const list = localLoad();
-        if (list.some((c) => c.phone === phone)) {
+        if (list.some((c) => c.phone === phone || c.phone === "0" + phone.slice(4) || c.phone === phone.slice(4))) {
           document.getElementById("note-title").textContent = "Contact already saved";
           document.getElementById("note-copy").textContent = "This number is already in the file.";
           document.getElementById("note-extra").style.display = "none";
