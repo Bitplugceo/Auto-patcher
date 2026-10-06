@@ -3,53 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contact card</title>
+  <title>Cardwell</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#f6f7f8; --ink:#121212; --muted:#6d747e; --line:#e6e8ec; --btn:#111; }
+    :root { --bg:#090b10; --card:#141820; --line:#2a3140; --text:#f4f1ea; --muted:#a7adba; --gold:#d7b56a; --green:#25d366; }
     * { box-sizing:border-box; margin:0; padding:0; }
-    body { min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
-    main { max-width:560px; margin:0 auto; padding:48px 20px 64px; }
-    h1 { font-size:40px; letter-spacing:-1px; line-height:1; }
-    p { color:var(--muted); margin:12px 0 28px; }
-    label { display:block; font-size:13px; font-weight:700; margin:14px 0 6px; }
-    input { width:100%; border:1px solid var(--line); background:#fff; border-radius:12px; padding:14px; font:inherit; }
-    button { width:100%; margin-top:18px; border:0; background:var(--btn); color:#fff; border-radius:999px; padding:14px; font-weight:700; font:inherit; }
-    .note { margin-top:14px; font-size:13px; }
+    body { font-family:Outfit,sans-serif; background:var(--bg); color:var(--text); }
+    header, main, footer { padding-left:6vw; padding-right:6vw; }
+    header { display:flex; justify-content:space-between; align-items:center; padding-top:22px; padding-bottom:22px; }
+    .logo { font-family:Fraunces,serif; font-size:28px; }
+    .btn { border:0; background:var(--gold); color:#1b1408; border-radius:999px; padding:12px 18px; font-weight:700; font:inherit; }
+    .ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
+    .hero { padding-top:28px; padding-bottom:20px; }
+    h1 { font-family:Fraunces,serif; font-size:clamp(40px,8vw,72px); line-height:.95; letter-spacing:-1px; }
+    .copy { color:var(--muted); max-width:640px; margin-top:14px; font-size:17px; }
+    .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; padding-bottom:40px; }
+    .panel { background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px; }
+    .kicker { color:var(--gold); letter-spacing:.16em; font-size:12px; font-weight:700; }
+    h2 { font-family:Fraunces,serif; font-size:34px; margin:8px 0 14px; }
+    label { display:block; font-size:13px; margin:12px 0 6px; color:var(--muted); }
+    input { width:100%; background:#0c0e13; color:var(--text); border:1px solid var(--line); border-radius:12px; padding:14px; font:inherit; }
+    .marks { display:flex; gap:10px; margin-top:18px; }
+    .mark { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:#10140c; border:1px solid #244; color:var(--green); font-weight:800; }
+    .person { display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .person b { display:block; }
+    .person span { color:var(--muted); font-size:13px; }
+    .empty { color:var(--muted); padding:12px 0; }
+    footer { color:var(--muted); font-size:12px; padding-bottom:28px; border-top:1px solid var(--line); padding-top:18px; }
+    .overlay { position:fixed; inset:0; background:rgba(5,6,10,.82); display:none; align-items:center; justify-content:center; padding:24px; }
+    .overlay.show { display:flex; }
+    .sheet { width:min(440px,100%); background:#161a22; border:1px solid var(--line); border-radius:22px; padding:32px 24px; text-align:center; }
+    .sheet h3 { font-family:Fraunces,serif; font-size:36px; margin:8px 0 10px; }
+    @media (max-width:800px) { .grid { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
+  <header>
+    <div class="logo">Cardwell</div>
+    <button class="btn" type="button" onclick="downloadAll()">Download .vcf</button>
+  </header>
   <main>
-    <h1>Make a contact card.</h1>
-    <p>Enter a number. The page builds a .vcf file you can save or send.</p>
-    <form id="form">
-      <label for="name">Name</label>
-      <input id="name" name="name" placeholder="Ada Cole" required>
-      <label for="phone">Number</label>
-      <input id="phone" name="phone" type="tel" placeholder="+1 415 555 0100" required>
-      <label for="email">Email, optional</label>
-      <input id="email" name="email" type="email" placeholder="ada@email.com">
-      <button type="submit">Download .vcf</button>
-    </form>
-    <p class="note" id="note"></p>
+    <section class="hero">
+      <h1>Save a number.<br>Keep the card.</h1>
+      <p class="copy">Enter a name and a number. Each one is added to the card file on this browser. Download the .vcf when the list is ready.</p>
+      <div class="marks" aria-hidden="true"><div class="mark">W</div><div class="mark">☎</div><div class="mark">vcf</div></div>
+    </section>
+    <section class="grid">
+      <form class="panel" id="form">
+        <div class="kicker">ADD</div>
+        <h2>Put them on the card.</h2>
+        <label for="name">Name</label>
+        <input id="name" name="name" placeholder="Ada Cole" required>
+        <label for="phone">Number</label>
+        <input id="phone" name="phone" type="tel" placeholder="+1 415 555 0100" required>
+        <button class="btn" style="margin-top:16px;width:100%" type="submit">Save contact</button>
+      </form>
+      <div class="panel">
+        <div class="kicker">FILE</div>
+        <h2>Compiled contacts</h2>
+        <div id="list"></div>
+        <button class="btn ghost" style="margin-top:16px" type="button" onclick="downloadAll()">Download all as .vcf</button>
+      </div>
+    </section>
   </main>
+  <footer>Contacts stay in this browser until you download the file. A GitHub page cannot collect numbers from other phones into one shared file by itself.</footer>
+  <div class="overlay" id="overlay">
+    <div class="sheet">
+      <div class="kicker">SAVED</div>
+      <h3>Added to the card.</h3>
+      <p class="copy">Download the .vcf whenever you want the full list.</p>
+      <button class="btn" style="margin-top:16px" type="button" onclick="document.getElementById('overlay').classList.remove('show')">Close</button>
+    </div>
+  </div>
   <script>
-    function esc(v) { return String(v).replace(/[\n\r]/g, " ").trim(); }
-    document.getElementById("form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = esc(document.getElementById("name").value);
-      const phone = esc(document.getElementById("phone").value);
-      const email = esc(document.getElementById("email").value);
-      const lines = ["BEGIN:VCARD", "VERSION:3.0", "FN:" + name, "TEL;TYPE=CELL:" + phone];
-      if (email) lines.push("EMAIL:" + email);
-      lines.push("END:VCARD");
-      const blob = new Blob([lines.join("\r\n") + "\r\n"], { type: "text/vcard" });
+    const key = "cardwell-contacts";
+    function load() { return JSON.parse(localStorage.getItem(key) || "[]"); }
+    function save(list) { localStorage.setItem(key, JSON.stringify(list)); }
+    function render() {
+      const list = load();
+      const box = document.getElementById("list");
+      box.innerHTML = "";
+      if (!list.length) { box.innerHTML = "<p class='empty'>No contacts yet.</p>"; return; }
+      list.forEach((c) => {
+        const row = document.createElement("div");
+        row.className = "person";
+        const left = document.createElement("div");
+        const b = document.createElement("b");
+        b.textContent = c.name;
+        const s = document.createElement("span");
+        s.textContent = c.phone;
+        left.append(b, s);
+        row.appendChild(left);
+        box.appendChild(row);
+      });
+    }
+    function vcard(list) {
+      return list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
+    }
+    function downloadAll() {
+      const list = load();
+      if (!list.length) return;
+      const blob = new Blob([vcard(list)], { type:"text/vcard" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = name.replace(/\s+/g, "-").toLowerCase() + ".vcf";
+      a.download = "contacts.vcf";
       a.click();
       URL.revokeObjectURL(a.href);
-      document.getElementById("note").textContent = "Saved " + a.download;
+    }
+    document.getElementById("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const list = load();
+      list.push({ name: document.getElementById("name").value.trim(), phone: document.getElementById("phone").value.trim() });
+      save(list);
+      e.target.reset();
+      render();
+      document.getElementById("overlay").classList.add("show");
     });
+    render();
   </script>
 </body>
 </html>
