@@ -1,3 +1,4 @@
+A
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -204,12 +205,13 @@
         localStorage.setItem("bitplug-read", "1");
       }, 5000);
     }
-    document.getElementById("form").addEventListener("submit", async (e) => {
+    document.getElementById("phone").addEventListener("input", (e) => e.target.setCustomValidity(""));
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
-      const raw = phoneEl.value.replace(/[\s-]/g, "");
-      let phone = "";
-      if (/^\+234[1-9]\d{9}$/.test(raw)) phone = raw;
+      let raw = phoneEl.value.replace(/[^\d+]/g, "");
+      if (raw.startsWith("234")) raw = "+" + raw;
+      if (/^\+2340\d{10}$/.test(raw)) raw = "+234" + raw.slice(5);
+      const phone = /^\+234[1-9]\d{9}$/.test(raw) ? raw : "";
       if (!phone) {
         phoneEl.setCustomValidity("Use the full format, like +2347069260719");
         phoneEl.reportValidity();
