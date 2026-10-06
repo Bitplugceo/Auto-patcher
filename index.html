@@ -1,15 +1,17 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#075e54">
   <title>BITPLUG CEO</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root { --green:#25d366; --deep:#075e54; --ink:#111b21; --muted:#667781; --line:#e6eeea; --chip:#f4f7f6; }
     * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#fff; color:var(--ink); }
-    header { position:sticky; top:0; z-index:2; background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:14px 6vw; gap:12px; }
+    html, body { background:#075e54; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); touch-action:manipulation; }
+    header { position:sticky; top:0; z-index:2; background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:calc(14px + env(safe-area-inset-top)) 6vw 14px; gap:12px; }
     .logo { font-weight:800; font-size:18px; letter-spacing:.04em; }
     a { color:inherit; text-decoration:none; }
     .btn { border:0; background:var(--green); color:#fff; border-radius:999px; padding:12px 18px; font:inherit; font-weight:700; display:inline-block; width:auto; }
@@ -61,7 +63,6 @@
   </header>
   <section class="hero">
     <h1>Numbers, sorted by state.</h1>
-    <p class="copy">People drop a name and a number, pick their own state, and the card grows in batches. Download one state, or the whole file.</p>
     <div class="pills"><span class="pill">Lagos</span><span class="pill">Oyo</span><span class="pill">Rivers</span><span class="pill">Kano</span><span class="pill">All states</span></div>
     <div class="steps">
       <div class="card"><div class="n">1</div><b>Pick your state</b><p class="copy">Choose the state you are in.</p></div>
