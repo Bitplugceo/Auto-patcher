@@ -4,36 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cardwell</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#090b10; --card:#141820; --line:#2a3140; --text:#f4f1ea; --muted:#a7adba; --gold:#d7b56a; --green:#25d366; }
+    :root { --green:#25d366; --deep:#075e54; --ink:#111b21; --muted:#667781; --line:#e9edef; --chip:#f0f2f5; }
     * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:Outfit,sans-serif; background:var(--bg); color:var(--text); }
-    header, main, footer { padding-left:6vw; padding-right:6vw; }
-    header { display:flex; justify-content:space-between; align-items:center; padding-top:22px; padding-bottom:22px; }
-    .logo { font-family:Fraunces,serif; font-size:28px; }
-    .btn { border:0; background:var(--gold); color:#1b1408; border-radius:999px; padding:12px 18px; font-weight:700; font:inherit; }
-    .ghost { background:transparent; color:var(--text); border:1px solid var(--line); }
-    .hero { padding-top:28px; padding-bottom:20px; }
-    h1 { font-family:Fraunces,serif; font-size:clamp(40px,8vw,72px); line-height:.95; letter-spacing:-1px; }
-    .copy { color:var(--muted); max-width:640px; margin-top:14px; font-size:17px; }
-    .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; padding-bottom:40px; }
-    .panel { background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px; }
-    .kicker { color:var(--gold); letter-spacing:.16em; font-size:12px; font-weight:700; }
-    h2 { font-family:Fraunces,serif; font-size:34px; margin:8px 0 14px; }
-    label { display:block; font-size:13px; margin:12px 0 6px; color:var(--muted); }
-    input { width:100%; background:#0c0e13; color:var(--text); border:1px solid var(--line); border-radius:12px; padding:14px; font:inherit; }
-    .marks { display:flex; gap:10px; margin-top:18px; }
-    .mark { width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:#10140c; border:1px solid #244; color:var(--green); font-weight:800; }
-    .person { display:flex; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
-    .person b { display:block; }
-    .person span { color:var(--muted); font-size:13px; }
-    .empty { color:var(--muted); padding:12px 0; }
-    footer { color:var(--muted); font-size:12px; padding-bottom:28px; border-top:1px solid var(--line); padding-top:18px; }
-    .overlay { position:fixed; inset:0; background:rgba(5,6,10,.82); display:none; align-items:center; justify-content:center; padding:24px; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#fff; color:var(--ink); }
+    header { background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:16px 6vw; }
+    .logo { font-size:22px; font-weight:750; }
+    .btn { border:0; background:var(--green); color:#fff; border-radius:999px; padding:12px 16px; font-weight:700; font:inherit; }
+    .ghost { background:#fff; color:var(--deep); border:1px solid var(--line); }
+    main { padding:28px 6vw 48px; }
+    h1 { font-size:clamp(36px,7vw,56px); letter-spacing:-1px; line-height:1; }
+    .copy { color:var(--muted); margin:12px 0 22px; max-width:560px; }
+    .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:18px; padding:18px; }
+    .kicker { color:var(--deep); font-size:12px; font-weight:800; letter-spacing:.12em; }
+    h2 { font-size:26px; margin:6px 0 12px; }
+    label { display:block; color:var(--muted); font-size:13px; margin:12px 0 6px; }
+    input { width:100%; background:var(--chip); border:0; border-radius:12px; padding:14px; font:inherit; }
+    .person { display:flex; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .person span, .empty { color:var(--muted); font-size:13px; }
+    .overlay { position:fixed; inset:0; background:rgba(7,94,84,.28); display:none; align-items:center; justify-content:center; padding:20px; }
     .overlay.show { display:flex; }
-    .sheet { width:min(440px,100%); background:#161a22; border:1px solid var(--line); border-radius:22px; padding:32px 24px; text-align:center; }
-    .sheet h3 { font-family:Fraunces,serif; font-size:36px; margin:8px 0 10px; }
+    .sheet { width:min(420px,100%); background:#fff; border-radius:20px; padding:28px 20px; text-align:center; }
+    footer { color:var(--muted); font-size:12px; padding:8px 6vw 28px; }
     @media (max-width:800px) { .grid { grid-template-columns:1fr; } }
   </style>
 </head>
@@ -43,19 +36,16 @@
     <button class="btn" type="button" onclick="downloadAll()">Download .vcf</button>
   </header>
   <main>
-    <section class="hero">
-      <h1>Save a number.<br>Keep the card.</h1>
-      <p class="copy">Enter a name and a number. Each one is added to the card file on this browser. Download the .vcf when the list is ready.</p>
-      <div class="marks" aria-hidden="true"><div class="mark">W</div><div class="mark">☎</div><div class="mark">vcf</div></div>
-    </section>
+    <h1>Save a number.<br>Keep the card.</h1>
+    <p class="copy">Add a name and a number. Each one joins the card file on this browser. Download the .vcf when the list is ready.</p>
     <section class="grid">
       <form class="panel" id="form">
         <div class="kicker">ADD</div>
-        <h2>Put them on the card.</h2>
+        <h2>New contact</h2>
         <label for="name">Name</label>
-        <input id="name" name="name" placeholder="Ada Cole" required>
+        <input id="name" placeholder="Ada Cole" required>
         <label for="phone">Number</label>
-        <input id="phone" name="phone" type="tel" placeholder="+1 415 555 0100" required>
+        <input id="phone" type="tel" placeholder="+234 800 000 0000" required>
         <button class="btn" style="margin-top:16px;width:100%" type="submit">Save contact</button>
       </form>
       <div class="panel">
@@ -66,19 +56,19 @@
       </div>
     </section>
   </main>
-  <footer>Contacts stay in this browser until you download the file. A GitHub page cannot collect numbers from other phones into one shared file by itself.</footer>
+  <footer>Contacts stay in this browser until you download the file.</footer>
   <div class="overlay" id="overlay">
     <div class="sheet">
       <div class="kicker">SAVED</div>
-      <h3>Added to the card.</h3>
+      <h2>Added to the card.</h2>
       <p class="copy">Download the .vcf whenever you want the full list.</p>
-      <button class="btn" style="margin-top:16px" type="button" onclick="document.getElementById('overlay').classList.remove('show')">Close</button>
+      <button class="btn" type="button" onclick="document.getElementById('overlay').classList.remove('show')">Close</button>
     </div>
   </div>
   <script>
     const key = "cardwell-contacts";
-    function load() { return JSON.parse(localStorage.getItem(key) || "[]"); }
-    function save(list) { localStorage.setItem(key, JSON.stringify(list)); }
+    const load = () => JSON.parse(localStorage.getItem(key) || "[]");
+    const save = (list) => localStorage.setItem(key, JSON.stringify(list));
     function render() {
       const list = load();
       const box = document.getElementById("list");
@@ -97,15 +87,12 @@
         box.appendChild(row);
       });
     }
-    function vcard(list) {
-      return list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
-    }
     function downloadAll() {
       const list = load();
       if (!list.length) return;
-      const blob = new Blob([vcard(list)], { type:"text/vcard" });
+      const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
+      a.href = URL.createObjectURL(new Blob([body], { type:"text/vcard" }));
       a.download = "contacts.vcf";
       a.click();
       URL.revokeObjectURL(a.href);
