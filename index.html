@@ -1,4 +1,3 @@
-A
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,7 +100,7 @@ A
         <label for="name">Name</label>
         <input id="name" placeholder="TheBetCeo" required>
         <label for="phone">Number</label>
-        <input id="phone" type="tel" inputmode="tel" placeholder="+2347069260719" required>
+        <input id="phone" type="tel" inputmode="tel" placeholder="Any number" required>
         <label for="city">Your city</label>
         <select id="city"></select>
         <div class="actions"><button class="btn" type="submit">Save contact</button></div>
@@ -208,10 +207,11 @@ A
     document.getElementById("phone").addEventListener("input", (e) => e.target.setCustomValidity(""));
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
-      let raw = phoneEl.value.replace(/[^\d+]/g, "");
-      if (raw.startsWith("234")) raw = "+" + raw;
-      if (/^\+2340\d{10}$/.test(raw)) raw = "+234" + raw.slice(5);
-      const phone = /^\+234[1-9]\d{9}$/.test(raw) ? raw : "";
+      let digits = phoneEl.value.replace(/\D/g, "");
+      if (digits.startsWith("2340") && digits.length === 14) digits = "234" + digits.slice(4);
+      if (digits.startsWith("0") && digits.length === 11) digits = "234" + digits.slice(1);
+      if (digits.length === 10) digits = "234" + digits;
+      const phone = /^234\d{10}$/.test(digits) ? "+" + digits : "";
       if (!phone) {
         phoneEl.setCustomValidity("Use the full format, like +2347069260719");
         phoneEl.reportValidity();
