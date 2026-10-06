@@ -1,4 +1,3 @@
-Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -212,8 +211,16 @@ Q
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
-      const phone = phoneEl.value.trim();
-      if (!phone) return;
+      let digits = phoneEl.value.replace(/\D/g, "");
+      if (digits.startsWith("234") && digits.length === 13) digits = digits.slice(3);
+      if (digits.startsWith("0") && digits.length === 11) digits = digits.slice(1);
+      const phone = /^\d{10}$/.test(digits) ? "+234" + digits : "";
+      if (!phone) {
+        phoneEl.setCustomValidity("Use +2347069260719, 07069260719, or 7069260719");
+        phoneEl.reportValidity();
+        return;
+      }
+      phoneEl.setCustomValidity("");
       const row = { name: phone === "+2347069260719" ? "TheBetCeo" : (document.getElementById("name").value.trim().replace(/\.TBC$/i, "") + ".TBC"), phone, city: city.value };
       document.getElementById("note-title").textContent = "Saved successfully";
       document.getElementById("note-copy").textContent = "The number is in that city’s batch.";
