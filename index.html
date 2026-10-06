@@ -1,3 +1,4 @@
+S
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -209,8 +210,17 @@
         document.getElementById("overlay").classList.add("show");
         return;
       }
-      const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"NOTE:" + c.city,"END:VCARD"].join("\r\n")).join("\r\n") + "\r\n";
-      window.location.href = "data:text/vcard;charset=utf-8," + encodeURIComponent(body);
+      const body = list.map((c) => ["BEGIN:VCARD","VERSION:3.0","N:;" + c.name + ";;;","FN:" + c.name,"TEL;TYPE=CELL:" + c.phone,"END:VCARD",""].join("\r\n")).join("\r\n");
+      const file = new File([body], "contacts.vcf", { type: "text/vcard" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); return; } catch (err) { if (err && err.name === "AbortError") return; }
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(file);
+      a.download = "contacts.vcf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
     pick.addEventListener("change", showCount);
     const termsOpen = document.getElementById("terms-open");
