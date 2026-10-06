@@ -1,3 +1,4 @@
+A
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,7 +115,7 @@
         <div>
           <div class="kicker">Invest</div>
           <h2>Tell us you want in.</h2>
-          <p class="copy">This form does not move bitcoin or ether. It does not ask for a seed phrase. A live firm would follow with identity checks and a custodian, not a wallet address pasted in a chat.</p>
+          <p class="copy">This form emails Dianatiaseca6@gmail.com. It does not move bitcoin or ether, and it does not ask for a seed phrase.</p>
         </div>
         <form id="form">
           <input name="name" placeholder="Name" required>
@@ -137,10 +138,29 @@
   </footer>
   <script>
     document.getElementById("menu").addEventListener("click", () => document.getElementById("nav").classList.toggle("open"));
-    document.getElementById("form").addEventListener("submit", (e) => {
+    document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      document.getElementById("note").textContent = "Interest noted on this page only. No coins were requested or received.";
-      e.target.reset();
+      const note = document.getElementById("note");
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      note.textContent = "Sending…";
+      try {
+        const res = await fetch("https://formsubmit.co/ajax/dianatiaseca6@gmail.com", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            amount: data.size,
+            _subject: "Northcurrent invest form",
+            _template: "table"
+          })
+        });
+        if (!res.ok) throw new Error("Form service refused the message");
+        note.textContent = "Sent. Check Dianatiaseca6@gmail.com. Confirm the first FormSubmit email if this is the first try.";
+        e.target.reset();
+      } catch (err) {
+        note.textContent = "Could not send. Check the connection and try again.";
+      }
     });
   </script>
 </body>
