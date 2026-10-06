@@ -1,4 +1,3 @@
-q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,7 +87,7 @@ q
     <div class="steps">
       <div class="card"><div class="n">1</div><b>Pick your state</b><p class="copy">Choose the state you are in.</p></div>
       <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that state’s batch.</p></div>
-      <div class="card"><div class="n">3</div><b>Preview &amp; download</b><p class="copy">See every contact in the batch first, then save them to your phone.</p></div>
+      <div class="card"><div class="n">3</div><b>Preview &amp; download</b><p class="copy">Tap the .vcf file, then choose Contacts.</p></div>
     </div>
   </section>
 
@@ -101,7 +100,7 @@ q
   <section>
     <div class="kicker">SAVE IT</div>
     <h2>Download, then add to contacts.</h2>
-    <p class="copy"><b>iPhone:</b> tap <b>Save to contacts</b>, then choose <b>Contacts</b> in the share sheet. If no share sheet shows, tap <b>Download file</b>, open it from your Downloads and tap <b>Add All</b>.<br><br><b>Android:</b> tap <b>Download file</b>, open it, then tap <b>Contacts</b> or <b>Import</b>.</p>
+    <p class="copy">Tap Download, then tap the .vcf file. The share sheet opens. Choose Contacts, then Add All.</p>
     <!-- Optional screenshots: upload step1.jpg / step2.jpg / step3.jpg into an "img" folder in your repo. Missing images simply hide. -->
     <div class="shots" id="shots">
       <figure><img src="img/step1.jpg" alt="Tap Preview and download" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>1. Tap Preview &amp; download</figcaption></figure>
@@ -161,19 +160,15 @@ q
   </div>
 
   <!-- Preview: shows ALL contacts first, then you save -->
-  <div class="overlay" id="preview">
+  <div class="overlay" id="filebox">
     <div class="sheet">
-      <div class="kicker">PREVIEW</div>
-      <h3 id="pv-title">Batch</h3>
-      <p class="copy" id="pv-count" style="margin:6px auto"></p>
-      <div class="list" id="pv-list"></div>
-      <div class="inapp" id="inapp">Open this page in Safari or Chrome (not inside Instagram, Facebook, TikTok, etc.) so saving works.</div>
-      <div class="btns">
-        <button class="btn block" id="pv-save" type="button">Save to contacts</button>
-        <button class="btn ghost block" id="pv-dl" type="button">Download file</button>
-        <button class="link" id="pv-close" type="button">Cancel</button>
-      </div>
-      <p class="tip">iPhone: pick <b>Contacts</b> in the share sheet. If nothing shows, use Download file, open it and tap Add All.</p>
+      <div class="kicker">FILE</div>
+      <h3>Tap the file</h3>
+      <button class="card" id="vcf-file" type="button" style="width:100%;text-align:left;margin-top:14px">
+        <b id="vcf-name">contacts.vcf</b>
+        <p class="copy" id="vcf-meta" style="margin:6px 0 0">Contact card</p>
+      </button>
+      <button class="link" id="file-close" type="button">Cancel</button>
     </div>
   </div>
 
@@ -326,14 +321,9 @@ q
 
     // ---------- preview, then save ----------
     let current = [];
-    let currentLabel = "all";
+    let currentName = "contacts.vcf";
 
-    function fileInfo() {
-      const label = currentLabel === "all" ? "all-states" : currentLabel.toLowerCase().replace(/\s+/g, "-");
-      return { body: toVcf(current), name: "bitplug-" + label + ".vcf" };
-    }
-
-    async function openPreview() {
+    async function openFile() {
       const btn = $("dl-btn");
       btn.disabled = true;
       btn.textContent = "Loading…";
@@ -341,80 +331,39 @@ q
         const list = await loadBatch();
         if (!list.length) { notice("No contacts", "Nothing in this batch yet."); return; }
         current = list;
-        currentLabel = pick.value;
-        $("pv-title").textContent = (currentLabel === "all" ? "All states" : currentLabel) + " batch";
-        $("pv-count").textContent = list.length + (list.length === 1 ? " contact" : " contacts") + " will be saved";
-        const box = $("pv-list");
-        box.textContent = "";
-        const frag = document.createDocumentFragment();
-        list.slice(0, 200).forEach((c) => {
-          const row = document.createElement("div");
-          row.className = "row";
-          const nm = document.createElement("b");
-          nm.textContent = c.name;       // textContent: names are user input, never innerHTML
-          const ph = document.createElement("span");
-          ph.textContent = c.phone;
-          row.append(nm, ph);
-          frag.appendChild(row);
-        });
-        if (list.length > 200) {
-          const more = document.createElement("div");
-          more.className = "row";
-          more.textContent = "+ " + (list.length - 200) + " more in the file";
-          frag.appendChild(more);
-        }
-        box.appendChild(frag);
-        $("preview").classList.add("show");
+        currentName = (pick.value === "all" ? "all-states" : pick.value.toLowerCase().replace(/\s+/g, "-")) + ".vcf";
+        $("vcf-name").textContent = currentName;
+        $("vcf-meta").textContent = "Contact card · " + list.length + (list.length === 1 ? " contact" : " contacts");
+        $("filebox").classList.add("show");
       } catch (e) {
         notice("Couldn't load contacts", "Check your connection and try again.");
       } finally {
         btn.disabled = false;
-        btn.textContent = "Preview & download";
+        btn.textContent = "Download this .vcf";
       }
     }
 
-    function downloadVcf() {
-      const { body, name } = fileInfo();
-      const url = URL.createObjectURL(new Blob([body], { type: "text/vcard;charset=utf-8" }));
+    async function openShare() {
+      const body = toVcf(current);
+      const file = new File([body], currentName, { type: "text/vcard" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      const url = URL.createObjectURL(file);
       const a = document.createElement("a");
       a.href = url;
-      a.download = name;
+      a.download = currentName;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
-    async function saveToContacts() {
-      const { body, name } = fileInfo();
-      // The file MUST be a real "*.vcf" file so iOS Contacts opens "Add All N Contacts"
-      const types = ["text/vcard", "text/x-vcard", "text/directory"];
-      try {
-        if (navigator.share && navigator.canShare) {
-          for (const t of types) {
-            const file = new File([body], name, { type: t });
-            if (navigator.canShare({ files: [file] })) {
-              await navigator.share({ files: [file] });
-              return;
-            }
-          }
-        }
-      } catch (e) {
-        if (e && e.name === "AbortError") return; // user cancelled the share sheet
-      }
-      downloadVcf(); // share not supported: normal download (still a real .vcf)
-    }
-
-    $("dl-btn").addEventListener("click", openPreview);
-    $("pv-save").addEventListener("click", saveToContacts);
-    $("pv-dl").addEventListener("click", downloadVcf);
-    $("pv-close").addEventListener("click", () => $("preview").classList.remove("show"));
-    $("preview").addEventListener("click", (e) => { if (e.target === $("preview")) $("preview").classList.remove("show"); });
+    $("dl-btn").addEventListener("click", openFile);
+    $("vcf-file").addEventListener("click", openShare);
+    $("file-close").addEventListener("click", () => $("filebox").classList.remove("show"));
+    $("filebox").addEventListener("click", (e) => { if (e.target === $("filebox")) $("filebox").classList.remove("show"); });
     $("note-close").addEventListener("click", () => $("overlay").classList.remove("show"));
-
-    if (/FBAN|FBAV|Instagram|Snapchat|TikTok|MicroMessenger|; wv\)/i.test(navigator.userAgent)) {
-      $("inapp").style.display = "block";
-    }
 
     // ---------- intro note ----------
     const terms = $("terms"), tclose = $("terms-close");
