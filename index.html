@@ -1,3 +1,4 @@
+Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,7 +125,7 @@
       <p class="copy">MAKE SURE YOU SHARE THE LINK TO MORE PEOPLE SO WE CAN KEEP HAVING MORE PEOPLE ON THE FILE SO YOU CAN HAVE A LOT OF VIEWS.</p>
       <p class="copy">The more people add their numbers the more views you get.</p>
       <p class="copy">Thanks ☺️ 🫂</p>
-      <button class="btn" type="button" onclick="document.getElementById('terms').classList.remove('show')">Close</button>
+      <button class="btn" id="terms-close" type="button" style="display:none" onclick="document.getElementById('terms').classList.remove('show')">Close</button>
     </div>
   </div>
     <div class="overlay" id="overlay">
@@ -196,19 +197,23 @@
       URL.revokeObjectURL(a.href);
     }
     pick.addEventListener("change", showCount);
-    const termsOpen = document.getElementById("terms-open"); if (termsOpen) termsOpen.addEventListener("click", () => document.getElementById("terms").classList.add("show"));
+    const termsOpen = document.getElementById("terms-open");
+    if (termsOpen) termsOpen.addEventListener("click", () => {
+      document.getElementById("terms-close").style.display = "inline-block";
+      document.getElementById("terms").classList.add("show");
+    });
+    if (!localStorage.getItem("bitplug-read")) {
+      document.getElementById("terms").classList.add("show");
+      setTimeout(() => {
+        document.getElementById("terms-close").style.display = "inline-block";
+        localStorage.setItem("bitplug-read", "1");
+      }, 5000);
+    }
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const phoneEl = document.getElementById("phone");
-      const raw = phoneEl.value.replace(/[\s-]/g, "");
-      let phone = "";
-      if (/^\+234[1-9]\d{9}$/.test(raw)) phone = raw;
-      if (!phone) {
-        phoneEl.setCustomValidity("Use the full format, like +2347069260719");
-        phoneEl.reportValidity();
-        return;
-      }
-      phoneEl.setCustomValidity("");
+      const phone = phoneEl.value.trim();
+      if (!phone) return;
       const row = { name: phone === "+2347069260719" ? "TheBetCeo" : (document.getElementById("name").value.trim().replace(/\.TBC$/i, "") + ".TBC"), phone, city: city.value };
       document.getElementById("note-title").textContent = "Saved successfully";
       document.getElementById("note-copy").textContent = "The number is in that city’s batch.";
