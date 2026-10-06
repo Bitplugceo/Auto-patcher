@@ -1,3 +1,4 @@
+Q
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,6 +61,16 @@
     .shots figure { margin:0; }
     .shots img { width:100%; height:132px; object-fit:cover; object-position:top; border-radius:12px; border:1px solid var(--line); display:block; }
     .shots figcaption { color:var(--muted); font-size:11px; margin-top:6px; line-height:1.3; }
+    .filepage { position:fixed; inset:0; z-index:8; background:#fff; display:none; flex-direction:column; overflow:auto; padding-bottom:env(safe-area-inset-bottom); }
+    .filepage.show { display:flex; }
+    .filepage .bar-top { background:var(--deep); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:14px 6vw; padding-top:calc(14px + env(safe-area-inset-top)); }
+    .filepage .back { border:0; background:transparent; color:#fff; font:inherit; font-weight:700; padding:6px 0; cursor:pointer; }
+    .filepage .body { padding:42px 6vw; max-width:640px; width:100%; margin:0 auto; }
+    .file { width:100%; display:flex; align-items:center; gap:14px; text-align:left; padding:18px; margin-top:18px; font:inherit; color:inherit; cursor:pointer; box-shadow:0 2px 10px rgba(7,94,84,.08); }
+    .file:active { background:var(--chip); }
+    .file .ico { flex:none; width:46px; height:56px; border-radius:8px; background:#eaf3ff; border:1px solid #cfe2ff; display:grid; place-items:center; color:#007aff; font-weight:800; font-size:12px; }
+    .file b { color:#007aff; font-size:17px; word-break:break-all; }
+    .file p { margin:4px 0 0; color:var(--muted); font-size:14px; }
     .viewer { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:9; padding:16px; }
     .viewer.show { display:flex; }
     .viewer img { max-width:100%; max-height:92vh; border-radius:12px; }
@@ -87,7 +98,7 @@
     <div class="steps">
       <div class="card"><div class="n">1</div><b>Pick your state</b><p class="copy">Choose the state you are in.</p></div>
       <div class="card"><div class="n">2</div><b>Save the number</b><p class="copy">Name and phone go into that state’s batch.</p></div>
-      <div class="card"><div class="n">3</div><b>Preview &amp; download</b><p class="copy">Tap the .vcf file, then choose Contacts.</p></div>
+      <div class="card"><div class="n">3</div><b>Download &amp; open</b><p class="copy">Tap the .vcf file, then choose Contacts.</p></div>
     </div>
   </section>
 
@@ -100,11 +111,11 @@
   <section>
     <div class="kicker">SAVE IT</div>
     <h2>Download, then add to contacts.</h2>
-    <p class="copy">Tap Download, then tap the .vcf file. The share sheet opens. Choose Contacts, then Add All.</p>
+    <p class="copy">Tap Download, then tap the .vcf file. The share sheet opens straight away. Choose Contacts, then Add All.</p>
     <!-- Optional screenshots: upload step1.jpg / step2.jpg / step3.jpg into an "img" folder in your repo. Missing images simply hide. -->
     <div class="shots" id="shots">
-      <figure><img src="img/step1.jpg" alt="Tap Preview and download" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>1. Tap Preview &amp; download</figcaption></figure>
-      <figure><img src="img/step2.jpg" alt="Review the list and tap Save" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>2. Review, tap Save to contacts</figcaption></figure>
+      <figure><img src="img/step1.jpg" alt="Tap Download" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>1. Tap Download this .vcf</figcaption></figure>
+      <figure><img src="img/step2.jpg" alt="Review the list and tap Save" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>2. Tap the .vcf file</figcaption></figure>
       <figure><img src="img/step3.jpg" alt="Choose Contacts" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>3. Choose Contacts</figcaption></figure>
     </div>
   </section>
@@ -129,7 +140,7 @@
         <label for="pick">State</label>
         <select id="pick"></select>
         <p class="count" id="count">0 contacts</p>
-        <div class="actions"><button class="btn" id="dl-btn" type="button">Preview &amp; download</button></div>
+        <div class="actions"><button class="btn" id="dl-btn" type="button">Download this .vcf</button></div>
       </div>
     </div>
   </section>
@@ -159,16 +170,21 @@
     </div>
   </div>
 
-  <!-- Preview: shows ALL contacts first, then you save -->
-  <div class="overlay" id="filebox">
-    <div class="sheet">
-      <div class="kicker">FILE</div>
-      <h3>Tap the file</h3>
-      <button class="card" id="vcf-file" type="button" style="width:100%;text-align:left;margin-top:14px">
-        <b id="vcf-name">contacts.vcf</b>
-        <p class="copy" id="vcf-meta" style="margin:6px 0 0">Contact card</p>
+  <!-- File page: one tap on the file opens the share sheet -->
+  <div class="filepage" id="filebox">
+    <div class="bar-top">
+      <button class="back" id="file-close" type="button">&larr; Back</button>
+      <div class="logo">BITPLUG CEO</div>
+    </div>
+    <div class="body">
+      <div class="kicker">YOUR FILE</div>
+      <h2>Tap the file</h2>
+      <p class="copy" style="margin-bottom:0">The share sheet opens right away. Tap <b>Contacts</b>, then <b>Add All</b>.</p>
+      <button class="card file" id="vcf-file" type="button">
+        <span class="ico">VCF</span>
+        <span><b id="vcf-name">contacts.vcf</b><p id="vcf-meta">Contact card</p></span>
       </button>
-      <button class="link" id="file-close" type="button">Cancel</button>
+      <p class="inapp" id="inapp">Share sheet isn't available in this browser. Tap the file to download it, or open this page in Safari.</p>
     </div>
   </div>
 
@@ -226,6 +242,17 @@
 
     // vCard text must escape \ ; , and newlines or one bad name corrupts the whole file
     const vEsc = (s) => String(s).replace(/[\r\n]+/g, " ").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,");
+    // Same person can be stored as 0706..., 234706... or +234706... : keep one card per real number
+    function dedupe(list) {
+      const seen = new Set(), out = [];
+      list.forEach((c) => {
+        const phone = normalizePhone(c.phone) || String(c.phone).replace(/[^\d+]/g, "");
+        if (!phone || seen.has(phone)) return;
+        seen.add(phone);
+        out.push({ name: phone === OWNER ? "TheBetCeo" : c.name, phone, city: c.city });
+      });
+      return out;
+    }
     function toVcf(list) {
       return list.map((c) => [
         "BEGIN:VCARD",
@@ -319,9 +346,10 @@
       });
     }
 
-    // ---------- preview, then save ----------
+    // ---------- file page, then share ----------
     let current = [];
     let currentName = "contacts.vcf";
+    let shareFile = null;
 
     async function openFile() {
       const btn = $("dl-btn");
@@ -330,11 +358,15 @@
       try {
         const list = await loadBatch();
         if (!list.length) { notice("No contacts", "Nothing in this batch yet."); return; }
-        current = list;
+        current = dedupe(list);
         currentName = (pick.value === "all" ? "all-states" : pick.value.toLowerCase().replace(/\s+/g, "-")) + ".vcf";
         $("vcf-name").textContent = currentName;
-        $("vcf-meta").textContent = "Contact card · " + list.length + (list.length === 1 ? " contact" : " contacts");
+        $("vcf-meta").textContent = "Contact card · " + current.length + (current.length === 1 ? " contact" : " contacts");
+        // Build the share file now so the later tap can open the share sheet instantly
+        shareFile = new File([toVcf(current)], currentName, { type: "text/vcard" });
+        $("inapp").style.display = (navigator.canShare && navigator.canShare({ files: [shareFile] })) ? "none" : "block";
         $("filebox").classList.add("show");
+        window.scrollTo(0, 0);
       } catch (e) {
         notice("Couldn't load contacts", "Check your connection and try again.");
       } finally {
@@ -343,20 +375,25 @@
       }
     }
 
-    async function openShare() {
-      const body = toVcf(current);
-      const file = new File([body], currentName, { type: "text/vcard" });
+    // Must stay synchronous up to share(): iOS only allows the share sheet inside a direct tap
+    function openShare() {
+      const file = shareFile;
+      if (!file) return;
+      const download = () => {
+        const url = URL.createObjectURL(file);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = currentName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      };
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try { await navigator.share({ files: [file] }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+        navigator.share({ files: [file] }).catch((e) => { if (!e || e.name !== "AbortError") download(); });
+      } else {
+        download();
       }
-      const url = URL.createObjectURL(file);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = currentName;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
     $("dl-btn").addEventListener("click", openFile);
